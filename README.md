@@ -1,73 +1,69 @@
 # ProofLead
 
-A premium, AI-powered lead scoring and enrichment tool built for high-performance sales teams. 
+ProofLead is an automated B2B lead enrichment and scoring tool. It solves the problem of sales teams wasting time on unverified, generic lead lists by programmatically extracting and verifying signals from public company data.
 
-Instead of just giving sales reps a list of 500 random companies, ProofLead enriches leads with deep data signals, scores them against your Ideal Customer Profile (ICP), and provides actionable insights on *why* a lead is worth calling and *how* to approach them.
+## How it works
 
-## 🌟 Key Features
+- **Data Fetching:** The system fetches the `/`, `/about`, and `/careers` pages of a company using an honest `ProofLeadBot` user-agent while strictly respecting `robots.txt` directives.
+- **Dynamic Rendering:** Puppeteer is used exclusively as a fallback for JS-rendered pages that return a `200 OK` status but lack static content.
+- **LLM Extraction:** HTML is stripped of navigational noise and sent to the Groq API (models defined in configuration) to extract structured firmographic data.
+- **Evidence Verification:** A strict verifier enforces that every extracted data point must include an exact, verbatim quote that physically exists in the scraped page text.
+- **ATS APIs:** If a supported ATS (Greenhouse, Lever, or Ashby) is detected on the careers page, the backend queries their public APIs to accurately extract open job counts and parse the tech stack via a whitelist regex.
+- **ICP Scoring:** Leads are evaluated against an Ideal Customer Profile (ICP), with strict score caps based on signal coverage (e.g., maximum score of 40 for 1 signal, 65 for 2 signals).
+- **Caching:** If live enrichment fails (due to rate limits, timeouts, or blocks), the system falls back to a local JSON cache and labels the data with a "usingCachedFrom" timestamp and the failure reason.
 
-1. **ICP Definition (Step 1)**: Define your Ideal Customer Profile (Industry, Size, Location, Tech Stack) to establish the baseline for scoring.
-2. **Flexible Lead Ingestion (Step 2)**: Upload CSVs, paste domains, or use the built-in sample dataset (30 real SaaS companies) for a flawless demo.
-3. **Data Enrichment**: (Simulated for demo reliability) Extracts firmographics, tech stack, and crucial growth/hiring signals.
-4. **Smart Lead Scoring**: 
-   - 0-100 score based on 5 weighted factors (Industry Match, Company Size, Location, Growth Signals, Tech Match).
-   - Fully transparent scoring with a visual breakdown.
-   - **Signal Coverage Caps**: To prevent falsely high scores on sparse data, scores are capped based on how many signals are successfully extracted:
-     - 1 valid signal = Max Score 40
-     - 2 valid signals = Max Score 65
-     - 3-5 valid signals = Max Score 100
-     - *Note: Tech matches only count positively for technologies explicitly selected in the ICP.*
-5. **Actionable Insights ("Why This Lead?")**: Automatically generates a clear explanation of why a lead is a good fit and how to approach them.
-6. **Premium Dashboard (Step 3)**: A sleek, dark-mode UI with sorting, filtering, deduplication, and a rich detail panel.
-7. **CSV Export**: Instantly export the prioritized list for the sales team.
+## Known limitations
 
-## 📊 Scoring Formula & Coverage Cap
+- The verifier checks that a quote exists verbatim in the text, but it does not contextually verify that the quote proves the claim.
+- The company industry is inferred by the LLM from the product description and marked with an `industryInferred` flag, which is an approximation.
+- Hiring metrics and tech stacks are currently only extracted if the company uses Greenhouse, Lever, or Ashby.
+- Bulk processing is heavily constrained by the Groq API's daily token and rate limits.
 
-The Lead Scoring Engine dynamically assigns a priority score (0-100) based on how well a company matches your Ideal Customer Profile (ICP).
+## Ethics
 
-### The Weights
-- **Industry Match (30%)**: Uses categorical mapping (e.g., "Developer Platform" translates to "DevTools"). Strict string matching is bypassed to handle real-world variations.
-- **Company Size (20%)**: Scaled linearly. If the target is 50-200 and a company is 500, they receive a proportionally lower score rather than a simple pass/fail.
-- **Location (20%)**: Checks if the extracted HQ matches target cities or countries.
-- **Hiring Signals (20%)**: Directly checks ATS boards (Greenhouse, Lever, Ashby) to mathematically prove the company is hiring.
-- **Tech Stack (10%)**: The more matched technologies, the higher the score.
+- **Honest Bot:** Uses an honest User-Agent (`ProofLeadBot/1.0 (+https://github.com/Naveen34822/ProofLead)`) with a clear contact link.
+- **Respectful Crawling:** Fully respects `robots.txt` and does not scrape disallowed paths.
+- **No Evasion:** The system will not attempt IP rotation, proxy networks, or evasion techniques when encountering `403 Forbidden` or `429 Too Many Requests`.
+- **No PII:** The system processes zero Personally Identifiable Information (PII) and focuses exclusively on firmographic data.
 
-### Dynamic Normalization & Coverage Cap
-The LLM may return `unknown` for fields it cannot verify with an exact quote. Instead of heavily penalizing a lead simply because the website is sparse, the scoring engine renormalizes the available weights. For example, if size is unknown, the score is calculated purely from Industry, Location, Hiring, and Tech.
+## Architecture
 
-To prevent sparse leads from falsely appearing as "High Priority", a **Coverage Cap** is applied based on the number of verified signals:
-- **1 Known Signal**: Score is strictly capped at **40**.
-- **2 Known Signals**: Score is strictly capped at **65**.
-- **3+ Known Signals**: Can reach **100**.
+- **Backend:** Node.js and Express.
+- **Frontend:** React and Vite.
+- **Cache Storage:** Local file system JSON cache (`backend/cache/`).
+- **Hosting / Deployment / Cloud Provider:** [Fill after deploy]
 
-*Note: To be flagged as a "High Priority" lead (Score 75+), the company must have at least 3 verified signals and a Medium/High confidence rating.*
+## Setup
 
-
-## 🛠️ Tech Stack
-
-- **Frontend**: React (Vite)
-- **Styling**: Vanilla CSS (Custom Design System, Glassmorphism, Dark Mode)
-- **Data Parsing**: PapaParse (CSV)
-- **Icons/Typography**: Inter & JetBrains Mono (Google Fonts)
-
-## 🚀 Running Locally
-
-1. Install dependencies:
+1. Clone the repository:
    ```bash
-   npm install
+   git clone https://github.com/Naveen34822/ProofLead.git
+   cd ProofLead
    ```
-2. Start the development server:
+2. Install dependencies for the root, frontend, and backend:
+   ```bash
+   npm run install:all
+   ```
+3. Copy the example environment variables and add your Groq API key:
+   ```bash
+   cp .env.example .env
+   # Edit .env and set GROQ_API_KEY=your_key
+   ```
+4. Start the application stack (both frontend and backend concurrently):
    ```bash
    npm run dev
    ```
-3. Open `http://localhost:5173` in your browser.
+5. To test the evidence verifier engine manually:
+   ```bash
+   node backend/test_verifier.cjs
+   ```
 
-## 💡 The "Actionable Insight" Differentiator
+## Dataset
 
-Most tools stop at data collection. ProofLead bridges the gap between data and action. By combining firmographic data with growth signals (like "actively hiring 42 roles" or "recent funding"), it tells the sales rep exactly *why* a company is a hot lead and provides an *Outreach Suggestion* tailored to that specific company's current state.
+- **File:** `20_enriched_test_leads.csv`
+- **Collection Date:** October 9, 2026
+- **User-Agent:** `ProofLeadBot/1.0 (+https://github.com/Naveen34822/ProofLead)`
 
-## 🧠 LLM Models
+## Time spent
 
-ProofLead uses the Groq API for rapid enrichment.
-- **Primary Model**: `openai/gpt-oss-120b` (via `process.env.GROQ_MODEL`)
-- **Fallback Model**: `openai/gpt-oss-20b` (for rate limits or JSON parse errors)
+Approximately 18 hours.
