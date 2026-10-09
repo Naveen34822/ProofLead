@@ -312,11 +312,11 @@ export default function ResultsDashboard({ leads, stats, icp, onExport, onSelect
                       {lead.industry || '—'}
                     </div>
                   )}
-                  {lead.industryUserProvided && <span style={{ fontSize: '0.7rem', opacity: 0.6, display: 'block' }}>(user-provided)</span>}
+                  {lead.industryUserProvided && <span style={{ fontSize: '0.7rem', opacity: 0.6, display: 'block' }}>(from CSV)</span>}
                 </td>
                 <td style={{ fontSize: '0.85rem', fontFamily: 'var(--font-mono)' }}>
                   {lead.employeeSize || '—'}
-                  {lead.employeeSizeUserProvided && <span style={{ fontSize: '0.7rem', opacity: 0.6, display: 'block' }}>(user-provided)</span>}
+                  {lead.employeeSizeUserProvided && <span style={{ fontSize: '0.7rem', opacity: 0.6, display: 'block' }}>(from CSV)</span>}
                 </td>
                 <td style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
                   {lead.enrichmentStatus === 'blocked' || lead.enrichmentStatus === 'failed' ? (
@@ -331,7 +331,7 @@ export default function ResultsDashboard({ leads, stats, icp, onExport, onSelect
                   {(lead.techSignals || []).map(t => typeof t === 'object' ? t.tech : t).slice(0, 5).join(', ') || '—'}
                 </td>
                 <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
-                  {Object.values(lead.factors || {}).filter(f => f.weight > 0).length}/4
+                  {Object.values(lead.factors || {}).filter(f => f.score > 0 || (f.label && !f.label.includes('Unknown') && !f.label.includes('Excluded'))).length}/{lead.totalSignals || 5}
                 </td>
                 <td>
                   <div title={lead.reason} style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', cursor: 'help', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '200px' }}>

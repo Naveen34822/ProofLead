@@ -106,6 +106,10 @@ const extractText = (html, maxLimit = 15000) => {
   const $ = cheerio.load(html);
   $('script, style, noscript, iframe, img, svg, header, footer, nav').remove();
   
+  $('blockquote').remove();
+  $('[class*="testimonial"], [class*="review"], [class*="quote"], [class*="customer-story"]').remove();
+  $('[id*="testimonial"], [id*="review"], [id*="quote"], [id*="customer-story"]').remove();
+  
   $('*').each(function() { $(this).append(' '); });
   
   let text = $('body').text().replace(/\s+/g, ' ').trim();
@@ -310,7 +314,7 @@ const checkAtsJobs = async (careersHtml, domain) => {
 };
 
 app.post('/api/enrich', liveEnrichLimiter, async (req, res) => {
-  const { domain, website, forceRefresh } = req.body;
+  const { domain, website, forceRefresh, csvIndustry } = req.body;
   if (!domain) return res.status(400).json({ error: 'Domain is required' });
 
   const row = db.prepare('SELECT * FROM leads WHERE domain = ?').get(domain);
@@ -396,7 +400,14 @@ app.post('/api/enrich', liveEnrichLimiter, async (req, res) => {
 
   const atsJobs = await checkAtsJobs(careersReq.html || homeReq.html, domain);
   
-  const combinedText = `HOMEPAGE:\n${homeReq.text}\n\nABOUT:\n${aboutReq.text}\n\nCAREERS:\n${careersReq.text}`;
+  // Extract meta/first-party text from home page
+  const $home = cheerio.load(homeReq.html);
+  const pageTitle = $home('title').text().trim();
+  const metaDesc = $home('meta[name="description"]').attr('content') || '';
+  const h1Text = $home('h1').map((_, el) => $home(el).text().trim()).get().join(' | ');
+
+  const metaText = `HOME PAGE METADATA:\nTitle: ${pageTitle}\nDescription: ${metaDesc}\nH1: ${h1Text}\n\n`;
+  const combinedText = metaText + `HOMEPAGE:\n${homeReq.text}\n\nABOUT:\n${aboutReq.text}\n\nCAREERS:\n${careersReq.text}`;
   
   const sources = {
     home: baseUrl,
@@ -433,7 +444,7 @@ ${atsJobs ? `6. hiringSignals: ${atsJobs.hiringSignals}\n7. hiringSignalsEvidenc
 10. locationEvidence: Snippet proving the location.
 
 Return ONLY a valid JSON object with keys: industry, industryEvidence, industryInferred, employeeSize, employeeSizeEvidence, hiringSignals, hiringSignalsEvidence, hiringJobCount, location, locationEvidence.
-CRITICAL RULE: Use ONLY the provided page text. If a field is not stated in the text, return "unknown" for the value and "Not found on fetched pages" for the evidence field. Every non-unknown field must include an exact quote from the text. Do not invent any values.
+CRITICAL RULE: Use ONLY the provided page text. If a field is not stated in the text, return "unknown" for the value and "Not found on fetched pages" for the evidence field. Every non-unknown field must include an exact quote from the text. Testimonials, customer quotes, and job titles are NOT valid evidence for industry or location/HQ. Do not invent any values.
 
 Text to analyze:
 ${combinedText.slice(0, 30000)}`;
@@ -547,8 +558,20 @@ ${combinedText.slice(0, 30000)}`;
       const reason = `Quote not found in text: "${data.industryEvidence}"`;
       console.warn(`[${domain}] REJECTED industry "${data.industry}". ${reason}`);
       rejectedFields.push({ field: 'industry', value: data.industry, reason });
-      data.industry = 'unknown';
-      data.industryEvidence = 'unknown';
+      data.industry = csvIndustry || 'unknown';
+      data.industryEvidence = csvIndustry ? null : 'unknown';
+      data.industryInferred = true;
+    } else {
+      // First party validation
+      const firstPartyText = metaText + (aboutReq.text.length > 0 ? aboutReq.text.slice(0, 1500) : '');
+      if (!verifyEvidence(data.industryEvidence, firstPartyText)) {
+        const reason = `Quote not found in first-party text (Home Meta/H1 or first 1500 chars of About): "${data.industryEvidence}"`;
+        console.warn(`[${domain}] REJECTED industry "${data.industry}". ${reason}`);
+        rejectedFields.push({ field: 'industry', value: data.industry, reason });
+        data.industry = csvIndustry || 'unknown';
+        data.industryEvidence = csvIndustry ? null : 'unknown';
+        data.industryInferred = true;
+      }
     }
     
     if (!verifyEvidence(data.employeeSizeEvidence, combinedText)) {
@@ -572,6 +595,7 @@ ${combinedText.slice(0, 30000)}`;
     }
 
     // Validate location evidence
+    let locEvidenceType = 'unknown';
     if (data.location && data.location !== 'unknown') {
       if (!verifyEvidence(data.locationEvidence, combinedText)) {
         const reason = `Quote not found in text: "${data.locationEvidence}"`;
@@ -579,8 +603,15 @@ ${combinedText.slice(0, 30000)}`;
         rejectedFields.push({ field: 'location', value: data.location, reason });
         data.location = 'unknown';
         data.locationEvidence = 'unknown';
+      } else {
+        const normLoc = normalize(data.locationEvidence);
+        if (normalize(metaText + homeReq.text).includes(normLoc)) locEvidenceType = 'home page';
+        else if (normalize(aboutReq.text).includes(normLoc)) locEvidenceType = 'about page';
+        else if (normalize(careersReq.text).includes(normLoc)) locEvidenceType = 'careers/job posting';
+        else locEvidenceType = 'unknown';
       }
     }
+    data.locationEvidenceType = locEvidenceType;
     
     // Compute confidence (only verified LLM fields)
     let verifiedScore = 0;

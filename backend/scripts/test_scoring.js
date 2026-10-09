@@ -263,43 +263,49 @@ function generateReason(company, factors, score, icp) {
 
   const parts = [];
   
-  if (factors.industry && factors.industry.weight > 0 && company.industry !== 'unknown') {
+  if (factors.industry.weight > 0) {
     if (factors.industry.score >= 80) {
       parts.push(`Industry matched (${company.industry})`);
     } else {
       const target = (icp.industries || []).join(', ') || '?';
       parts.push(`Industry mismatch (target: ${target}, found: ${company.industry})`);
     }
+  } else {
+    parts.push(`Industry unknown`);
   }
   
-  if (factors.size && factors.size.weight > 0 && company.employeeSize !== 'unknown') {
+  if (factors.size.weight > 0) {
     if (factors.size.score >= 80) parts.push(`Size matched (${company.employeeSize})`);
     else parts.push(`Size partial (${company.employeeSize})`);
+  } else {
+    parts.push(`Size unknown`);
   }
   
-  if (factors.location && factors.location.weight > 0 && factors.location.label !== 'Location (Excluded)' && company.location !== 'unknown') {
+  if (factors.location.weight > 0) {
     if (factors.location.score >= 80) parts.push(`Location matched (${company.location})`);
     else parts.push(`Location mismatch (${company.location})`);
+  } else {
+    parts.push(`Location unknown`);
   }
   
-  const isHiringKnown = company.hiringSignals !== undefined && company.hiringSignals !== null && company.hiringSignals !== 'unknown';
-  if (factors.hiring && factors.hiring.weight > 0 && isHiringKnown) {
-    if (company.hiringSignals === true || company.hiringSignals === 'true') {
+  if (factors.hiring.weight > 0) {
+    if (company.hiringSignals) {
       const count = company.hiringJobCount ? ` (${company.hiringJobCount})` : '';
       parts.push(`Hiring active${count}`);
     } else {
       parts.push(`Hiring not active`);
     }
+  } else {
+    parts.push(`Hiring unknown`);
   }
   
-  const isTechKnown = company.techSignals && Array.isArray(company.techSignals) && company.techSignals.length > 0;
-  if (factors.tech && factors.tech.weight > 0 && isTechKnown) {
-    const techList = company.techSignals.map(t => typeof t === 'object' ? t.tech : t).join(', ');
+  if (factors.tech.weight > 0) {
+    const techList = (company.techSignals || []).map(t => typeof t === 'object' ? t.tech : t).join(', ');
     if (factors.tech.score >= 70) parts.push(`Tech matches (${techList})`);
     else parts.push(`Tech partial (${techList})`);
+  } else {
+    parts.push(`Tech unknown`);
   }
-  
-  if (parts.length === 0) return 'Insufficient data.';
   
   return parts.join(', ') + '.';
 }
@@ -309,12 +315,10 @@ function generateOutreach(company, factors, score) {
   
   const knownInd = company.industry && company.industry !== 'unknown';
   const knownSize = company.employeeSize && company.employeeSize !== 'unknown';
-  const isHiringKnown = company.hiringSignals !== undefined && company.hiringSignals !== null && company.hiringSignals !== 'unknown';
-  const isHiringActive = isHiringKnown && (company.hiringSignals === true || company.hiringSignals === 'true');
   
   let angle = '';
   
-  if (isHiringActive) {
+  if (company.hiringSignals) {
     angle = `Since they are actively hiring, pitch how your solution accelerates onboarding and supports scaling teams`;
   } else if (knownSize) {
     angle = `Focus your messaging on driving ROI and operational efficiency for a team of ${company.employeeSize}`;
@@ -408,3 +412,33 @@ export function leadsToCSV(leads) {
   
   return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
 }
+}
+
+import Database from 'better-sqlite3';
+const db = new Database('/Users/naveen/Desktop/Caprae_Capital/backend/data/leads.db');
+const row = db.prepare("SELECT * FROM leads WHERE domain = 'loom.com'").get();
+const company = JSON.parse(row.data);
+company.domain = 'loom.com';
+company.csvEmployees = 'unknown';
+
+const icpWithLocation = {
+  industries: ['Productivity', 'DevTools', 'Communication'],
+  employeeMin: 50,
+  employeeMax: 1000,
+  locations: ['San Francisco'],
+  techStack: ['react']
+};
+
+const icpWithoutLocation = {
+  industries: ['Productivity', 'DevTools', 'Communication'],
+  employeeMin: 50,
+  employeeMax: 1000,
+  locations: [],
+  techStack: ['react']
+};
+
+console.log('--- LOOM PANEL VALUES (With Location Target) ---');
+console.log(JSON.stringify(scoreCompany(company, icpWithLocation), null, 2));
+
+console.log('\n--- LOOM PANEL VALUES (Without Location Target) ---');
+console.log(JSON.stringify(scoreCompany(company, icpWithoutLocation), null, 2));

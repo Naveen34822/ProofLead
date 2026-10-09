@@ -9,7 +9,7 @@ ProofLead is an automated B2B lead enrichment and scoring tool. It solves the pr
 - **LLM Extraction:** HTML is stripped of navigational noise and sent to the Groq API (models defined in configuration) to extract structured firmographic data.
 - **Evidence Verification:** A strict verifier enforces that every extracted data point must include an exact, verbatim quote that physically exists in the scraped page text.
 - **ATS APIs:** If a supported ATS (Greenhouse, Lever, or Ashby) is detected on the careers page, the backend queries their public APIs to accurately extract open job counts and parse the tech stack via a whitelist regex.
-- **ICP Scoring:** Leads are evaluated against an Ideal Customer Profile (ICP), with strict score caps based on signal coverage (e.g., maximum score of 80 for 3 signals). High Priority requires at least 4 signals (including size).
+- **ICP Scoring:** Leads are evaluated against an Ideal Customer Profile (ICP). Signal coverage uses a dynamic denominator (x/4 if location targets are excluded from the ICP, x/5 otherwise). Strict score caps are applied based on this coverage (e.g., maximum score of 80 for 3 signals). High Priority requires at least 4 signals (including size).
 - **Caching & Storage:** Enrichment results are stored persistently in a local SQLite database (`backend/data/leads.db`).
 - **CSV Fallback:** If the website doesn't state employee size or industry, the tool seamlessly merges fallback data from the uploaded CSV and labels it "from CSV".
 - **Dashboard & Filters:** The React frontend provides a robust results dashboard with advanced filtering by score, status, industry, hiring signals, and confidence.

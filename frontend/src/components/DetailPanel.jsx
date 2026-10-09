@@ -132,7 +132,7 @@ export default function DetailPanel({ lead, onClose, onStatusChange }) {
             <h3 className="detail-section-title">Score Breakdown</h3>
             {lead.rawScore !== undefined && lead.rawScore !== lead.score && (
               <p style={{ fontSize: '0.85rem', color: 'var(--warning)', marginBottom: '1rem' }}>
-                Raw {lead.rawScore} → capped at {lead.score} ({lead.validSignals} of 4 signals known)
+                Raw {lead.rawScore} → capped at {lead.score} ({lead.validSignals} of {lead.totalSignals || 5} signals known)
               </p>
             )}
             <div className="score-breakdown">
@@ -183,7 +183,7 @@ export default function DetailPanel({ lead, onClose, onStatusChange }) {
                 <span className="detail-field-label">Industry</span>
                 <span className="detail-field-value">
                   {lead.industry || 'unknown'}
-                  {lead.industryUserProvided && <span style={{ fontSize: '0.7rem', opacity: 0.6, marginLeft: '0.5rem' }}>(user-provided)</span>}
+                  {lead.industryUserProvided && <span style={{ fontSize: '0.7rem', opacity: 0.6, marginLeft: '0.5rem' }}>(from CSV)</span>}
                 </span>
               </div>
               {lead.industryEvidence && (
@@ -198,7 +198,7 @@ export default function DetailPanel({ lead, onClose, onStatusChange }) {
                 <span className="detail-field-label">Employee Size</span>
                 <span className="detail-field-value">
                   {lead.employeeSize || 'unknown'}
-                  {lead.employeeSizeUserProvided && <span style={{ fontSize: '0.7rem', opacity: 0.6, marginLeft: '0.5rem' }}>(user-provided)</span>}
+                  {lead.employeeSizeUserProvided && <span style={{ fontSize: '0.7rem', opacity: 0.6, marginLeft: '0.5rem' }}>(from CSV)</span>}
                 </span>
               </div>
               {lead.employeeSizeEvidence && (
@@ -213,12 +213,17 @@ export default function DetailPanel({ lead, onClose, onStatusChange }) {
                 <span className="detail-field-label">Location</span>
                 <span className="detail-field-value">
                   {lead.location || 'unknown'}
-                  {lead.locationUserProvided && <span style={{ fontSize: '0.7rem', opacity: 0.6, marginLeft: '0.5rem' }}>(user-provided)</span>}
+                  {lead.locationUserProvided && <span style={{ fontSize: '0.7rem', opacity: 0.6, marginLeft: '0.5rem' }}>(from CSV)</span>}
                 </span>
               </div>
               {lead.locationEvidence && (
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'var(--bg-tertiary)', padding: '0.5rem', borderRadius: '4px', width: '100%', fontStyle: 'italic' }}>
                   "{lead.locationEvidence === 'unknown' ? 'Not found on fetched pages' : lead.locationEvidence}"
+                  {lead.locationEvidenceType && lead.locationEvidenceType !== 'unknown' && (
+                    <div style={{ marginTop: '0.25rem', fontSize: '0.65rem', fontStyle: 'normal', opacity: 0.8 }}>
+                      Source: {lead.locationEvidenceType}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

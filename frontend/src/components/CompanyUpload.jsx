@@ -16,22 +16,34 @@ export default function CompanyUpload({ onSubmit, onUseSample, onBack }) {
     });
 
     const parsed = result.data
-      .map(row => ({
-        name: row.name || row.company || row.company_name || '',
-        domain: (row.domain || row.website || row.url || '')
+      .map(row => {
+        const domain = (row.domain || row.website || row.url || '')
+          .trim()
+          .toLowerCase()
           .replace(/^https?:\/\//, '')
           .replace(/^www\./, '')
-          .replace(/\/.*$/, ''),
-        website: row.website || row.url || (row.domain ? `https://${row.domain}` : ''),
-        csvEmployees: row.employees || row.size || row.employee_size || null,
-        csvLocation: row.location || row.headquarters || null,
-        csvIndustry: row.industry || null,
-        csvLinkedin: row.linkedin || row.linkedin_url || null,
-        csvEmail: row.email || row.contact_email || null,
-      }))
+          .replace(/\/.*$/, '');
+        
+        return {
+          name: row.name || row.company || row.company_name || '',
+          domain,
+          website: row.website || row.url || (domain ? `https://${domain}` : ''),
+          csvEmployees: row.employees || row.size || row.employee_size || null,
+          csvLocation: row.location || row.headquarters || null,
+          csvIndustry: row.industry || null,
+          csvLinkedin: row.linkedin || row.linkedin_url || null,
+          csvEmail: row.email || row.contact_email || null,
+        };
+      })
       .filter(c => c.name || c.domain);
 
-    return parsed;
+    const uniqueMap = new Map();
+    parsed.forEach(c => {
+      const key = c.domain || c.name;
+      if (key && !uniqueMap.has(key)) uniqueMap.set(key, c);
+    });
+    
+    return Array.from(uniqueMap.values());
   }, []);
 
   const handleFileUpload = useCallback((file) => {
