@@ -160,9 +160,9 @@ function App() {
       <header className="app-header">
         <div className="header-inner">
           <div className="logo">
-            <div className="logo-icon">L</div>
+            <div className="logo-icon">P</div>
             <div className="logo-text">
-              Lead<span>Scout</span>
+              Proof<span>Lead</span>
             </div>
           </div>
           <nav className="header-nav">

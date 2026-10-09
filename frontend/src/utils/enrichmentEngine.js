@@ -36,6 +36,9 @@ export async function enrichCompany(input) {
       }
     }
     
+    if (input.employees) data.csvEmployees = String(input.employees);
+    if (input.industry) data.csvIndustry = input.industry;
+    
     return {
       name: input.name || domain.split('.')[0],
       domain: domain,

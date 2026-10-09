@@ -208,8 +208,8 @@ export function scoreCompany(company, icp) {
 
   for (const key in factors) {
     if (factors[key].weight > 0) {
-      // Re-normalize score based on available weights
-      const points = (factors[key].score * factors[key].weight) / totalWeights;
+      // No renormalization: absolute sum
+      const points = factors[key].score * factors[key].weight;
       factors[key].points = Math.round(points);
       totalScore += points;
     } else {
@@ -225,11 +225,14 @@ export function scoreCompany(company, icp) {
     totalScore = Math.min(totalScore, 40);
   } else if (validSignals === 2) {
     totalScore = Math.min(totalScore, 65);
+  } else if (validSignals === 3) {
+    totalScore = Math.min(totalScore, 80);
   }
   
-  // High priority (75+) requires at least 3 known signals and Medium/High confidence
+  // High priority (75+) requires at least 4 known signals including size, and Medium/High confidence
   if (totalScore >= 75) {
-    if (validSignals < 3 || company.confidence === 'low' || company.confidence === 'failed') {
+    const hasSize = factors.size && factors.size.weight > 0;
+    if (validSignals < 4 || !hasSize || company.confidence === 'low' || company.confidence === 'failed') {
       totalScore = 74;
     }
   }

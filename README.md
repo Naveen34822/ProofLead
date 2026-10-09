@@ -9,12 +9,15 @@ ProofLead is an automated B2B lead enrichment and scoring tool. It solves the pr
 - **LLM Extraction:** HTML is stripped of navigational noise and sent to the Groq API (models defined in configuration) to extract structured firmographic data.
 - **Evidence Verification:** A strict verifier enforces that every extracted data point must include an exact, verbatim quote that physically exists in the scraped page text.
 - **ATS APIs:** If a supported ATS (Greenhouse, Lever, or Ashby) is detected on the careers page, the backend queries their public APIs to accurately extract open job counts and parse the tech stack via a whitelist regex.
-- **ICP Scoring:** Leads are evaluated against an Ideal Customer Profile (ICP), with strict score caps based on signal coverage (e.g., maximum score of 40 for 1 signal, 65 for 2 signals).
-- **Caching:** If live enrichment fails (due to rate limits, timeouts, or blocks), the system falls back to a local JSON cache and labels the data with a "usingCachedFrom" timestamp and the failure reason.
+- **ICP Scoring:** Leads are evaluated against an Ideal Customer Profile (ICP), with strict score caps based on signal coverage (e.g., maximum score of 80 for 3 signals). High Priority requires at least 4 signals (including size).
+- **Caching & Storage:** Enrichment results are stored persistently in a local SQLite database (`backend/data/leads.db`).
+- **CSV Fallback:** If the website doesn't state employee size or industry, the tool seamlessly merges fallback data from the uploaded CSV and labels it "from CSV".
+- **Dashboard & Filters:** The React frontend provides a robust results dashboard with advanced filtering by score, status, industry, hiring signals, and confidence.
+- **Export:** Enriched data can be exported to a CSV file ready for CRM systems like HubSpot.
 
 ## Known limitations
 
-- The verifier checks that a quote exists verbatim in the text, but it does not contextually verify that the quote proves the claim.
+- The verifier checks that a quote exists verbatim in the text, but it does not contextually verify that the quote proves the claim (e.g., a real but irrelevant quote might be accepted).
 - The company industry is inferred by the LLM from the product description and marked with an `industryInferred` flag, which is an approximation.
 - Hiring metrics and tech stacks are currently only extracted if the company uses Greenhouse, Lever, or Ashby.
 - Bulk processing is heavily constrained by the Groq API's daily token and rate limits.
@@ -30,7 +33,7 @@ ProofLead is an automated B2B lead enrichment and scoring tool. It solves the pr
 
 - **Backend:** Node.js and Express.
 - **Frontend:** React and Vite.
-- **Cache Storage:** Local file system JSON cache (`backend/cache/`).
+- **Database:** SQLite (`better-sqlite3`).
 - **Hosting / Deployment / Cloud Provider:** [Fill after deploy]
 
 ## Setup
@@ -53,9 +56,10 @@ ProofLead is an automated B2B lead enrichment and scoring tool. It solves the pr
    ```bash
    npm run dev
    ```
-5. To test the evidence verifier engine manually:
+5. To run the evidence verifier tests:
    ```bash
-   node backend/test_verifier.cjs
+   cd backend
+   npm run test
    ```
 
 ## Dataset

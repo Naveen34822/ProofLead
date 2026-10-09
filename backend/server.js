@@ -428,15 +428,11 @@ app.post('/api/enrich', liveEnrichLimiter, async (req, res) => {
 3. industryInferred: boolean. Mark this true if you inferred the industry from the product description.
 4. employeeSize: A string hint of the employee size (e.g., "50-200", "1000+"). Often found on about or careers pages. Return "unknown" if unclear.
 5. employeeSizeEvidence: Snippet proving the size.
-6. techSignals: Array of strings — ONLY recognised programming languages, frameworks, cloud providers, or databases (e.g. React, Python, AWS, PostgreSQL). Do NOT include operating systems (Mac, Windows, iOS, Android, Linux) or browsers.
-7. techSignalsEvidence: Snippet proving the tech stack.
-${atsJobs ? `8. hiringSignals: ${atsJobs.hiringSignals}\n9. hiringSignalsEvidence: "${atsJobs.hiringSignalsEvidence}"\n10. hiringJobCount: ${atsJobs.count || 0}` : `8. hiringSignals: "unknown"\n9. hiringSignalsEvidence: "Not found on fetched pages"\n10. hiringJobCount: 0`}
-11. location: The company's headquarters or primary office location (city, country). Return "unknown" if not stated.
-12. locationEvidence: Snippet proving the location.
-13. businessModel: The core business model. Default to "unknown". Return "SaaS", "Services", "Marketplace", or "Other" ONLY when the quote explicitly shows software delivered as a product or subscription (e.g. pricing plans, sign-up, "platform", "software"); a tagline alone is not enough.
-14. businessModelEvidence: A verbatim quote that describes the product, proving the business model selection.
+${atsJobs ? `6. hiringSignals: ${atsJobs.hiringSignals}\n7. hiringSignalsEvidence: "${atsJobs.hiringSignalsEvidence}"\n8. hiringJobCount: ${atsJobs.count || 0}` : `6. hiringSignals: "unknown"\n7. hiringSignalsEvidence: "Not found on fetched pages"\n8. hiringJobCount: 0`}
+9. location: The company's headquarters or primary office location (city, country). Return "unknown" if not stated.
+10. locationEvidence: Snippet proving the location.
 
-Return ONLY a valid JSON object with keys: industry, industryEvidence, industryInferred, employeeSize, employeeSizeEvidence, techSignals, techSignalsEvidence, hiringSignals, hiringSignalsEvidence, hiringJobCount, location, locationEvidence, businessModel, businessModelEvidence.
+Return ONLY a valid JSON object with keys: industry, industryEvidence, industryInferred, employeeSize, employeeSizeEvidence, hiringSignals, hiringSignalsEvidence, hiringJobCount, location, locationEvidence.
 CRITICAL RULE: Use ONLY the provided page text. If a field is not stated in the text, return "unknown" for the value and "Not found on fetched pages" for the evidence field. Every non-unknown field must include an exact quote from the text. Do not invent any values.
 
 Text to analyze:
@@ -500,59 +496,34 @@ ${combinedText.slice(0, 30000)}`;
 
     let data = JSON.parse(response.choices[0].message.content);
     
-    // Filter tech stack: reject blacklisted, require whitelist match
-    if (Array.isArray(data.techSignals)) {
-      const llmTechs = new Map();
-      for (const t of data.techSignals) {
-        if (typeof t !== 'string') continue;
-        let lower = t.toLowerCase().trim();
-        if (lower === 'node') lower = 'node.js';
-        if (TECH_BLACKLIST.has(lower)) continue;
-        if (TECH_WHITELIST.has(lower)) {
-           if (!llmTechs.has(lower)) {
-              llmTechs.set(lower, { tech: lower, source: 'website' });
-           }
-        }
-      }
-      data.techSignals = Array.from(llmTechs.values());
-      
-      if (data.techSignals.length === 0) {
-        data.techSignalsEvidence = 'unknown';
-      }
+    // Deterministic businessModel check
+    let detBM = 'unknown';
+    let detBME = 'unknown';
+    const lowerText = combinedText.toLowerCase();
+    const saasKeywords = ['sign up', 'log in', 'login', 'free trial'];
+    const hasSaaS = saasKeywords.some(k => lowerText.includes(k));
+    if (lowerText.includes('pricing') && hasSaaS) {
+       detBM = 'SaaS';
+       const snippetStart = Math.max(0, lowerText.indexOf('pricing') - 30);
+       detBME = combinedText.substring(snippetStart, snippetStart + 80).replace(/\s+/g, ' ') + '... [contains SaaS keywords]';
+    }
+    data.businessModel = detBM;
+    data.businessModelEvidence = detBME;
+    
+    // Tech comes ONLY from ATS
+    const companyName = domain.split('.')[0].toLowerCase();
+    if (atsJobs && atsJobs.atsTechFound && atsJobs.atsTechFound.length > 0) {
+      data.techSignals = atsJobs.atsTechFound
+        .filter(t => t.tech !== companyName)
+        .sort((a, b) => (b.count || 0) - (a.count || 0));
+      data.techSignalsEvidence = atsJobs.atsTechEvidence;
     } else {
       data.techSignals = [];
-    }
-    
-    // Inject ATS tech
-    if (atsJobs && atsJobs.atsTechFound && atsJobs.atsTechFound.length > 0) {
-      const combinedTech = new Map();
-      // ATS first (has valid counts)
-      for (const t of atsJobs.atsTechFound) {
-        combinedTech.set(t.tech, t);
-      }
-      // Add LLM if not already in ATS
-      for (const t of data.techSignals) {
-        if (!combinedTech.has(t.tech)) {
-           combinedTech.set(t.tech, t);
-        }
-      }
-      // Sort by source (ATS first) then count descending
-      data.techSignals = Array.from(combinedTech.values()).sort((a, b) => {
-        if (a.source === 'ats' && b.source !== 'ats') return -1;
-        if (a.source !== 'ats' && b.source === 'ats') return 1;
-        if (a.source === 'ats' && b.source === 'ats') return (b.count || 0) - (a.count || 0);
-        return 0;
-      });
-      
-      if (!data.techSignalsEvidence || data.techSignalsEvidence === 'unknown') {
-        data.techSignalsEvidence = atsJobs.atsTechEvidence;
-      } else {
-        data.techSignalsEvidence += ` | ${atsJobs.atsTechEvidence}`;
-      }
+      data.techSignalsEvidence = 'unknown';
     }
     
     if (Array.isArray(data.techSignals)) {
-      console.log(`[${domain}] Tech after whitelist filter: [${data.techSignals.map(t => t.tech).join(', ')}]`);
+      console.log(`[${domain}] Tech from ATS: [${data.techSignals.map(t => t.tech).join(', ')}]`);
     }
     
     // Verification step
@@ -570,13 +541,7 @@ ${combinedText.slice(0, 30000)}`;
     
     console.log(`[${domain}] RAW LLM DATA: ${JSON.stringify(data)}`);
     
-    if (!verifyEvidence(data.businessModelEvidence, combinedText)) {
-      const reason = `Quote not found in text: "${data.businessModelEvidence}"`;
-      console.warn(`[${domain}] REJECTED businessModel "${data.businessModel}". ${reason}`);
-      rejectedFields.push({ field: 'businessModel', value: data.businessModel, reason });
-      data.businessModel = 'unknown';
-      data.businessModelEvidence = 'unknown';
-    }
+    // businessModel is deterministically generated, so no LLM verification needed
 
     if (!verifyEvidence(data.industryEvidence, combinedText)) {
       const reason = `Quote not found in text: "${data.industryEvidence}"`;
@@ -594,13 +559,7 @@ ${combinedText.slice(0, 30000)}`;
       data.employeeSizeEvidence = 'unknown';
     }
     
-    if (!verifyEvidence(data.techSignalsEvidence, combinedText)) {
-      const reason = `Quote not found in text: "${data.techSignalsEvidence}"`;
-      console.warn(`[${domain}] REJECTED techSignals "[${data.techSignals.map(t=>t.tech).join(',')}]". ${reason}`);
-      rejectedFields.push({ field: 'techSignals', value: data.techSignals, reason });
-      data.techSignals = [];
-      data.techSignalsEvidence = 'unknown';
-    }
+    // Tech signals are strictly from ATS, no verification against website text needed.
     
     if (atsJobs) {
       data.hiringSignals = atsJobs.hiringSignals;

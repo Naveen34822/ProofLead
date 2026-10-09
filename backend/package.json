@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node --max-http-header-size=65536 server.js",
     "dev": "node --max-http-header-size=65536 server.js",
-    "export-seed": "node export-seed.js"
+    "export-seed": "node export-seed.js",
+    "test": "node tests/verifier.test.js"
   },
   "dependencies": {
     "axios": "^1.20.0",
