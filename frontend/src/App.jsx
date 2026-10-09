@@ -3,6 +3,8 @@ import ICPForm from './components/ICPForm';
 import CompanyUpload from './components/CompanyUpload';
 import EnrichingOverlay from './components/EnrichingOverlay';
 import ResultsDashboard from './components/ResultsDashboard';
+import Papa from 'papaparse';
+import { useEffect } from 'react';
 import DetailPanel from './components/DetailPanel';
 import { enrichBatch } from './utils/enrichmentEngine';
 import { scoreAndRankLeads, leadsToCSV } from './utils/scoringEngine';
@@ -24,6 +26,14 @@ function App() {
   const [isEnriching, setIsEnriching] = useState(false);
   const [enrichProgress, setEnrichProgress] = useState({ current: 0, total: 0, name: '' });
   const [selectedLead, setSelectedLead] = useState(null);
+  const [budget, setBudget] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/budget')
+      .then(r => r.json())
+      .then(data => setBudget(data))
+      .catch(e => console.error('Failed to fetch budget', e));
+  }, [currentStep, isEnriching]);
 
   // Step 1: ICP submitted
   const handleICPSubmit = useCallback((icpData) => {
@@ -60,12 +70,24 @@ function App() {
 
   // Use sample data
   const handleUseSampleData = useCallback(async () => {
-    const minimal = sampleCompanies.map(c => ({
-      name: c.name,
-      domain: c.domain,
-      website: c.website
-    }));
-    await handleCompaniesSubmit(minimal);
+    try {
+      const response = await fetch('/sample.csv');
+      const text = await response.text();
+      Papa.parse(text, {
+        header: true,
+        skipEmptyLines: true,
+        complete: async (results) => {
+          const mapped = results.data.map(row => ({
+            name: row.Website || row.Domain || row.name || 'Unknown',
+            domain: row.Website || row.Domain || row.domain,
+            website: row.Website || row.Domain || row.website
+          })).filter(c => c.domain);
+          await handleCompaniesSubmit(mapped);
+        }
+      });
+    } catch(e) {
+      console.error('Failed to load sample dataset', e);
+    }
   }, [handleCompaniesSubmit]);
 
   // Export CSV
@@ -166,6 +188,12 @@ function App() {
             </div>
           </div>
           <nav className="header-nav">
+            {budget && (
+              <div style={{ marginRight: '1rem', color: '#666', fontSize: '0.9rem', display: 'flex', alignItems: 'center' }}>
+                <span style={{ marginRight: '0.5rem', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: (budget.cap - budget.used) > 0 ? '#10b981' : '#ef4444' }}></span>
+                Live Budget: {Math.max(0, budget.cap - budget.used)}/{budget.cap} left today
+              </div>
+            )}
             {STEPS.map((step, i) => (
               <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 {i > 0 && <div className="nav-divider" />}

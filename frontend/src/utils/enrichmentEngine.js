@@ -7,7 +7,7 @@ export async function enrichCompany(input) {
   
   let res;
   try {
-    res = await fetch('http://localhost:3001/api/enrich', {
+    res = await fetch('/api/enrich', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

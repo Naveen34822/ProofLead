@@ -24,8 +24,8 @@ app.use(cors());
 app.use(express.json());
 
 const liveEnrichLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // Limit each IP to 5 requests per `window` (here, per hour)
+  windowMs: 24 * 60 * 60 * 1000, // 24 hours
+  max: parseInt(process.env.PER_IP_LIVE_CAP) || 5, // Limit each IP to 5 requests per `window` (here, per hour)
   skip: (req) => {
     return req.ip === '127.0.0.1' || req.ip === '::1' || req.ip === '::ffff:127.0.0.1';
   },
@@ -42,7 +42,8 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-const db = new Database(path.join(dataDir, 'leads.db'));
+const dbPath = process.env.DB_PATH || path.join(dataDir, 'leads.db');
+const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 db.exec(`
   CREATE TABLE IF NOT EXISTS leads (
@@ -58,6 +59,13 @@ db.exec(`
     using_cached_from TEXT
   )
 `);
+db.exec(`
+  CREATE TABLE IF NOT EXISTS daily_stats (
+    date TEXT PRIMARY KEY,
+    count INTEGER
+  )
+`);
+
 
 const seedDir = path.join(__dirname, 'seed');
 const seedFile = path.join(seedDir, 'leads.json');
@@ -125,7 +133,7 @@ const extractText = (html, maxLimit = 15000) => {
 
 const fetchPage = async (url, usePuppeteer = false, retryCount = 0, isWwwRetry = false, charLimit = 15000) => {
   try {
-    if (usePuppeteer) {
+    if (usePuppeteer && process.env.PUPPETEER_ENABLED !== 'false') {
       console.log(`[Puppeteer] Fetching ${url}...`);
       const browser = await puppeteer.launch({ headless: 'new' });
       const page = await browser.newPage();
@@ -292,6 +300,7 @@ const checkAtsJobs = async (careersHtml, domain) => {
     
     if (count > 0) {
       return {
+        atsDetected: atsData.type,
         hiringSignals: true,
         hiringSignalsEvidence: atsData.url,
         count,
@@ -300,6 +309,7 @@ const checkAtsJobs = async (careersHtml, domain) => {
       };
     } else {
       return {
+        atsDetected: atsData.type,
         hiringSignals: false,
         hiringSignalsEvidence: atsData.url,
         count: 0,
@@ -310,10 +320,33 @@ const checkAtsJobs = async (careersHtml, domain) => {
   } catch (err) {
     console.warn(`[${domain}] ATS API fetch failed for ${atsData.type}:`, err.message);
   }
-  return null;
+  return { atsDetected: atsData ? atsData.type : null, hiringSignals: 'unknown', count: null };
 };
 
+app.get('/api/health', (req, res) => res.json({status: 'ok'}));
+
+app.get('/api/budget', (req, res) => {
+  const dailyCap = parseInt(process.env.DAILY_LIVE_CAP) || 25;
+  try {
+    const row = db.prepare("SELECT count FROM daily_stats WHERE date = date('now')").get();
+    res.json({ used: row ? row.count : 0, cap: dailyCap });
+  } catch(e) {
+    res.json({ used: 0, cap: dailyCap });
+  }
+});
+
+
 app.post('/api/enrich', liveEnrichLimiter, async (req, res) => {
+  const dailyCap = parseInt(process.env.DAILY_LIVE_CAP) || 25;
+  let isGlobalCapExceeded = false;
+  try {
+    const todaysLiveCountRow = db.prepare("SELECT count FROM daily_stats WHERE date = date('now')").get();
+    if (todaysLiveCountRow && todaysLiveCountRow.count >= dailyCap) {
+       isGlobalCapExceeded = true;
+    }
+  } catch(e) {
+    console.error('Error checking global cap', e);
+  }
   const { domain, website, forceRefresh, csvIndustry } = req.body;
   if (!domain) return res.status(400).json({ error: 'Domain is required' });
 
@@ -338,16 +371,19 @@ app.post('/api/enrich', liveEnrichLimiter, async (req, res) => {
     }
   }
 
-  if (req.rateLimitExceeded) {
+
+  if (req.rateLimitExceeded || isGlobalCapExceeded) {
     if (existingCache && existingCache.enrichmentStatus === 'success') {
-      console.log(`[${domain}] Rate limit exceeded. Serving cache fallback.`);
+      const reason = isGlobalCapExceeded ? 'global_daily_cap_exceeded' : 'rate_limit_exceeded_ip_max';
+      console.log(`[${domain}] ${reason}. Serving cache fallback.`);
       return res.status(200).json({
         ...existingCache,
         usingCachedFrom: existingCache.fetchedAt,
-        failedReason: 'rate_limit_exceeded_ip_max_5'
+        failedReason: reason
       });
     }
-    return res.status(429).json({ error: 'IP Rate limit exceeded (Max 5 live companies)', enrichmentStatus: 'failed' });
+    const errMessage = isGlobalCapExceeded ? `Global Daily Limit exceeded (Max ${dailyCap} live enrichments/day)` : 'IP Rate limit exceeded';
+    return res.status(429).json({ error: errMessage, enrichmentStatus: 'failed' });
   }
 
   const baseUrl = website || (domain.startsWith('http') ? domain : `https://${domain}`);
@@ -522,11 +558,14 @@ ${combinedText.slice(0, 30000)}`;
     data.businessModelEvidence = detBME;
     
     // Tech comes ONLY from ATS
-    const companyName = domain.split('.')[0].toLowerCase();
+    
+    const domainLabel = domain.split('.')[0].toLowerCase();
+    const csvNameLabel = (data.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     if (atsJobs && atsJobs.atsTechFound && atsJobs.atsTechFound.length > 0) {
       data.techSignals = atsJobs.atsTechFound
-        .filter(t => t.tech !== companyName)
+        .filter(t => t.tech !== domainLabel && (!csvNameLabel || t.tech !== csvNameLabel) && t.tech !== companyName)
         .sort((a, b) => (b.count || 0) - (a.count || 0));
+
       data.techSignalsEvidence = atsJobs.atsTechEvidence;
     } else {
       data.techSignals = [];
@@ -585,10 +624,12 @@ ${combinedText.slice(0, 30000)}`;
     // Tech signals are strictly from ATS, no verification against website text needed.
     
     if (atsJobs) {
+      data.atsDetected = atsJobs.atsDetected;
       data.hiringSignals = atsJobs.hiringSignals;
       data.hiringSignalsEvidence = atsJobs.hiringSignalsEvidence;
       data.hiringJobCount = atsJobs.count; // atsJobs.count is already an integer
     } else {
+      data.atsDetected = null;
       data.hiringSignals = 'unknown';
       data.hiringSignalsEvidence = `Not found (fetch returned ${textLength} chars)`;
       data.hiringJobCount = null;
@@ -640,7 +681,10 @@ ${combinedText.slice(0, 30000)}`;
     const tokens = response?.usage?.total_tokens || null;
     data._diagnostics = { rawLLM, rejectedFields, tokens };
     
+    
     if (data.enrichmentStatus === 'success' && data.textLength >= 500) {
+      db.prepare(`INSERT INTO daily_stats (date, count) VALUES (date('now'), 1) ON CONFLICT(date) DO UPDATE SET count = count + 1`).run();
+
       db.prepare(`
         INSERT INTO leads (domain, data, confidence, status, source, fetched_at)
         VALUES (@domain, @data, @confidence, @status, @source, @fetched_at)
@@ -675,7 +719,14 @@ ${combinedText.slice(0, 30000)}`;
   }
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+app.use('/api', (req, res) => res.status(404).json({error: 'Not found'}));
+app.get(/^.*$/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
+
 app.listen(PORT, () => {
   console.log(`Enrichment server running on http://localhost:${PORT}`);
 });

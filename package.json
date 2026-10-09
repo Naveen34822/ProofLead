@@ -6,7 +6,9 @@
     "dev:backend": "npm run dev --prefix backend",
     "dev:frontend": "npm run dev --prefix frontend",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend"
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
+    "build": "cd frontend && npm install && npm run build",
+    "start": "node backend/server.js"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",
@@ -29,5 +31,8 @@
     "puppeteer": "^25.12.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }

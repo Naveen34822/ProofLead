@@ -323,7 +323,7 @@ export default function ResultsDashboard({ leads, stats, icp, onExport, onSelect
                     <span style={{ color: 'var(--text-muted)' }}>—</span>
                   ) : (
                     <span style={{ color: lead.hiringJobCount > 0 ? 'var(--success)' : 'var(--text-muted)' }}>
-                      {lead.hiringJobCount > 0 && '✓ '}{formatHiring(lead.hiringSignals, lead.hiringJobCount)}
+                      {lead.hiringJobCount > 0 && '✓ '}{formatHiring(lead.hiringSignals, lead.hiringJobCount, lead.atsDetected)}
                     </span>
                   )}
                 </td>

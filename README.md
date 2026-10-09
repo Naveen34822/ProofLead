@@ -71,3 +71,19 @@ ProofLead is an automated B2B lead enrichment and scoring tool. It solves the pr
 ## Time spent
 
 Approximately 18 hours.
+
+
+## Hosted Demo (Render)
+When deploying ProofLead on Render (Web Service):
+- **Puppeteer** is disabled () as it requires extra dependencies.
+- **Database**: We use SQLite () instead of a JSON cache. On a fresh deployment, the database is automatically seeded from .
+- **Caps**: To prevent abuse on the demo, a global daily cap is set via  (default 25) and an IP-based cap via  (default 5).
+
+### Environment Variables
+- : Your Groq API key
+- : Model to use (default: )
+- : Set to  on Render, defaults to  locally
+- : Path to the SQLite database (e.g. )
+- : Global daily live enrichments limit
+- : Per-IP limit for live enrichments
+- : Port to run the server

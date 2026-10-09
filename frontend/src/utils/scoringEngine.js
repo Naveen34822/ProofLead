@@ -359,6 +359,7 @@ export function scoreAndRankLeads(companies, icp) {
   
   scored.forEach((item, i) => {
     item.rank = i + 1;
+    if (!item.totalSignals) item.totalSignals = (icp.locations && icp.locations.length > 0) ? 5 : 4;
   });
   
   const validLeads = scored.filter(l => l.enrichmentStatus !== 'failed' && !l.isInsufficient);

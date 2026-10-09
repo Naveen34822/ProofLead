@@ -1,0 +1,21 @@
+name,domain,website,linkedin,email,employees,industry
+Stripe,stripe.com,https://stripe.com,https://www.linkedin.com/company/stripe,hello@stripe.com,1000+,FinTech
+Twilio,twilio.com,https://twilio.com,https://www.linkedin.com/company/twilio,sales@twilio.com,1000+,Cloud Communications
+Snowflake,snowflake.com,https://snowflake.com,https://www.linkedin.com/company/snowflake-computing,info@snowflake.com,1000+,Cloud Database
+Datadog,datadoghq.com,https://datadoghq.com,https://www.linkedin.com/company/datadog,contact@datadoghq.com,1000+,Cloud Monitoring
+HashiCorp,hashicorp.com,https://hashicorp.com,https://www.linkedin.com/company/hashicorp,sales@hashicorp.com,1000+,DevOps
+GitLab,gitlab.com,https://gitlab.com,https://www.linkedin.com/company/gitlab-com,contact@gitlab.com,1000+,DevOps
+Postman,postman.com,https://postman.com,https://www.linkedin.com/company/postman-api-tools,hello@postman.com,500-1000,API Management
+Vercel,vercel.com,https://vercel.com,https://www.linkedin.com/company/vercel,sales@vercel.com,200-500,Cloud Infrastructure
+Supabase,supabase.com,https://supabase.com,https://www.linkedin.com/company/supabase,hello@supabase.com,50-200,Developer Platform
+Retool,retool.com,https://retool.com,https://www.linkedin.com/company/retool,sales@retool.com,200-500,Internal Tools
+Linear,linear.app,https://linear.app,https://www.linkedin.com/company/linear-app,hello@linear.app,50-200,Project Management
+Webflow,webflow.com,https://webflow.com,https://www.linkedin.com/company/webflow-inc,contact@webflow.com,500-1000,Web Development
+Notion,notion.so,https://notion.so,https://www.linkedin.com/company/notionhq,team@notion.so,500-1000,Productivity SaaS
+Figma,figma.com,https://figma.com,https://www.linkedin.com/company/figma,sales@figma.com,1000+,Design SaaS
+Canva,canva.com,https://canva.com,https://www.linkedin.com/company/canva,hello@canva.com,1000+,Design SaaS
+Airtable,airtable.com,https://airtable.com,https://www.linkedin.com/company/airtable,sales@airtable.com,500-1000,Productivity SaaS
+Loom,loom.com,https://loom.com,https://www.linkedin.com/company/loom-hq,hello@loom.com,200-500,Video SaaS
+Deel,deel.com,https://deel.com,https://www.linkedin.com/company/deel,sales@deel.com,1000+,HR Tech
+Brex,brex.com,https://brex.com,https://www.linkedin.com/company/brex,hello@brex.com,1000+,FinTech
+Ramp,ramp.com,https://ramp.com,https://www.linkedin.com/company/ramp,sales@ramp.com,500-1000,FinTech
