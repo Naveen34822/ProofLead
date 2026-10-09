@@ -327,8 +327,16 @@ export default function ResultsDashboard({ leads, stats, icp, onExport, onSelect
                     </span>
                   )}
                 </td>
-                <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={(lead.techSignals || []).map(t => typeof t === 'object' ? t.tech : t).join(', ')}>
-                  {(lead.techSignals || []).map(t => typeof t === 'object' ? t.tech : t).slice(0, 5).join(', ') || '—'}
+                <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={(lead.techSignals || []).map(t => {
+                    const tech = typeof t === 'object' ? t.tech : t;
+                    const capTech = tech ? tech.charAt(0).toUpperCase() + tech.slice(1) : '';
+                    return typeof t === 'object' && t.count ? `${capTech} (${t.count}/${t.totalRoles} roles)` : capTech;
+                  }).join(', ')}>
+                  {(lead.techSignals || []).map(t => {
+                    const tech = typeof t === 'object' ? t.tech : t;
+                    const capTech = tech ? tech.charAt(0).toUpperCase() + tech.slice(1) : '';
+                    return typeof t === 'object' && t.count ? `${capTech} (${t.count}/${t.totalRoles} roles)` : capTech;
+                  }).slice(0, 5).join(', ') || '—'}
                 </td>
                 <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
                   {Object.values(lead.factors || {}).filter(f => f.score > 0 || (f.label && !f.label.includes('Unknown') && !f.label.includes('Excluded'))).length}/{lead.totalSignals || 5}

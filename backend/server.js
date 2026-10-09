@@ -91,15 +91,46 @@ if (rowCount === 0 && fs.existsSync(seedFile)) {
   })();
 }
 
+const TECH_ALIASES = {
+  "react.js": "react", "reactjs": "react",
+  "node.js": "node.js", "nodejs": "node.js", "node": "node.js",
+  "golang": "go",
+  "ts": "typescript",
+  "js": "javascript",
+  "k8s": "kubernetes",
+  "postgres": "postgresql",
+  "vue.js": "vue", "vuejs": "vue",
+  "c++": "c++", "c#": "c#", ".net": ".net"
+};
+
+const DISPLAY_NAMES = {
+  "react": "React", "python": "Python", "node.js": "Node.js", "aws": "AWS", "gcp": "GCP",
+  "java": "Java", "go": "Go", "typescript": "TypeScript", "javascript": "JavaScript",
+  "kubernetes": "Kubernetes", "postgresql": "PostgreSQL", "mongodb": "MongoDB",
+  "vue": "Vue.js", "angular": "Angular", "django": "Django", "flask": "Flask",
+  "docker": "Docker", "redis": "Redis", "elasticsearch": "Elasticsearch", "azure": "Azure",
+  "ruby": "Ruby", "rails": "Ruby on Rails", "php": "PHP", "laravel": "Laravel",
+  "mysql": "MySQL", "c++": "C++", "c#": "C#", ".net": ".NET", "rust": "Rust",
+  "swift": "Swift", "kotlin": "Kotlin", "graphql": "GraphQL", "spring": "Spring",
+  "terraform": "Terraform", "next.js": "Next.js", "nuxt": "Nuxt.js",
+  "hadoop": "Hadoop", "spark": "Spark", "kafka": "Kafka", "rabbitmq": "RabbitMQ",
+  "nginx": "Nginx", "prometheus": "Prometheus", "grafana": "Grafana",
+  "snowflake": "Snowflake", "bigquery": "BigQuery", "dynamodb": "DynamoDB",
+  "cassandra": "Cassandra", "firebase": "Firebase", "svelte": "Svelte",
+  "gatsby": "Gatsby", "fastapi": "FastAPI", "express": "Express"
+};
+
+const AMBIGUOUS_WORDS = new Set(["go", "spring", "swift", "spark", "express"]);
+
 const TECH_WHITELIST = new Set([
-  'react', 'python', 'node', 'node.js', 'aws', 'gcp', 'java', 'go', 'golang',
-  'typescript', 'javascript', 'kubernetes', 'postgresql', 'mongodb', 'vue',
-  'angular', 'django', 'flask', 'docker', 'redis', 'elasticsearch', 'azure',
-  'ruby', 'rails', 'php', 'laravel', 'mysql', 'c++', 'c#', '.net', 'rust',
-  'swift', 'kotlin', 'graphql', 'spring', 'terraform', 'next.js', 'nuxt',
-  'hadoop', 'spark', 'kafka', 'rabbitmq', 'nginx', 'prometheus', 'grafana',
-  'snowflake', 'bigquery', 'dynamodb', 'cassandra', 'supabase', 'firebase',
-  'svelte', 'remix', 'gatsby', 'express', 'fastapi', 'gin', 'echo'
+  "react", "react.js", "reactjs", "python", "node", "node.js", "nodejs", "aws", "gcp", "java", "go", "golang",
+  "typescript", "ts", "javascript", "js", "kubernetes", "k8s", "postgresql", "postgres", "mongodb", "vue",
+  "angular", "django", "flask", "docker", "redis", "elasticsearch", "azure",
+  "ruby", "rails", "php", "laravel", "mysql", "c++", "c#", ".net", "rust",
+  "swift", "kotlin", "graphql", "spring", "terraform", "next.js", "nuxt",
+  "hadoop", "spark", "kafka", "rabbitmq", "nginx", "prometheus", "grafana",
+  "snowflake", "bigquery", "dynamodb", "cassandra", "firebase",
+  "svelte", "gatsby", "express", "fastapi", "elixir"
 ]);
 const TECH_BLACKLIST = new Set([
   'mac', 'macos', 'windows', 'ios', 'android', 'linux', 'chrome', 'firefox',
@@ -239,65 +270,87 @@ const checkAtsJobs = async (careersHtml, domain) => {
       console.log(`[${domain}] Ashby response status: ${res.status}, count: ${count}`);
     }
     
-    let techCounts = {};
+        let techCounts = {};
     let engineeringRolesCount = 0;
     
     for (const job of jobsList) {
-      const title = (job.title || job.text || '').toLowerCase();
-      let department = '';
+      const title = (job.title || job.text || "").toLowerCase();
+      let department = "";
       if (job.categories && job.categories.team) department = job.categories.team;
       else if (job.departments && job.departments[0] && job.departments[0].name) department = job.departments[0].name;
       else if (job.department) department = job.department;
       
       department = department.toLowerCase();
       
-      const isEngRole = title.includes('engineer') || title.includes('developer') || title.includes('data') || title.includes('product') ||
-                        department.includes('engineer') || department.includes('data') || department.includes('product');
+      const isEngRole = title.includes("engineer") || title.includes("developer") || title.includes("data") || title.includes("product") ||
+                        department.includes("engineer") || department.includes("data") || department.includes("product");
                         
       if (isEngRole) {
         engineeringRolesCount++;
         const textRaw = JSON.stringify(job);
         const textLower = textRaw.toLowerCase();
+        const roleTechs = new Set();
         
         for (const tech of TECH_WHITELIST) {
           let found = false;
-          if (tech === 'go') {
-            if (/\bgolang\b/i.test(textRaw) || /\bGo\b/.test(textRaw)) {
-              found = true;
-            }
-          } else {
-            const escaped = tech.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-            const regex = new RegExp(`(?:^|[^a-z0-9])${escaped}(?:[^a-z0-9]|$)`, 'i');
+          if (AMBIGUOUS_WORDS.has(tech)) {
+            const capTech = tech.charAt(0).toUpperCase() + tech.slice(1);
+            const regex = new RegExp("(?:^|[^a-zA-Z0-9])" + capTech + "(?:[^a-zA-Z0-9]|$)");
+            if (regex.test(textRaw)) found = true;
+          } else if (tech === "c++" || tech === "c#" || tech === ".net") {
+            const escaped = tech.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+            const regex = new RegExp("(?:^|\\s)" + escaped + "(?:\\s|$)", "i");
             if (regex.test(textLower)) found = true;
+          } else {
+            const escaped = tech.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+            const regex = new RegExp("\\b" + escaped + "\\b", "i");
+            if (regex.test(textLower)) {
+               if (tech === "java" && /\bjavascript\b/i.test(textLower) && !/\bjava\b/i.test(textLower)) {
+                 found = false;
+               } else {
+                 found = true;
+               }
+            }
           }
+          
           if (found) {
-            const techName = tech === 'node' ? 'node.js' : tech;
-            techCounts[techName] = (techCounts[techName] || 0) + 1;
+            const canonical = TECH_ALIASES[tech] || tech;
+            roleTechs.add(canonical);
           }
+        }
+        
+        for (const t of roleTechs) {
+          techCounts[t] = (techCounts[t] || 0) + 1;
         }
       }
     }
     
     let atsTechFound = [];
+
     let atsTechEvidence = '';
     
-    if (engineeringRolesCount > 0) {
+        if (engineeringRolesCount > 0) {
       const validTechs = Object.entries(techCounts)
         .filter(([tech, tCount]) => tCount >= 3 || (tCount / engineeringRolesCount) >= 0.1)
         .sort((a, b) => b[1] - a[1]);
         
       if (validTechs.length > 0) {
-        atsTechFound = validTechs.map(t => ({
-          tech: t[0],
-          source: 'ats',
-          count: t[1],
-          totalRoles: engineeringRolesCount
-        }));
-        const topTech = validTechs[0];
-        atsTechEvidence = `Found in ATS: ${topTech[0]} in ${topTech[1]} of ${engineeringRolesCount} engineering/product roles`;
+        const domainLabel = domain.split(".")[0].toLowerCase();
+        
+        for (const [tech, tCount] of validTechs) {
+          if (tech !== domainLabel) {
+            const displayName = DISPLAY_NAMES[tech] || (tech.charAt(0).toUpperCase() + tech.slice(1));
+            atsTechFound.push({
+              tech: displayName,
+              source: "ats",
+              count: tCount,
+              totalRoles: engineeringRolesCount
+            });
+          }
+        }
       }
     }
-    
+
     if (count > 0) {
       return {
         atsDetected: atsData.type,

@@ -287,8 +287,9 @@ export default function DetailPanel({ lead, onClose, onStatusChange }) {
               <div className="form-chips">
                 {lead.techSignals.map((t, idx) => {
                   const techName = typeof t === 'object' ? t.tech : t;
-                  const countLabel = typeof t === 'object' && t.source === 'ats' && t.count > 0 ? ` (${t.count}/${t.totalRoles})` : '';
-                  return <span key={techName + idx} className="chip">{techName}{countLabel}</span>;
+                  const capTech = techName.charAt(0).toUpperCase() + techName.slice(1);
+                  const countLabel = typeof t === 'object' && t.source === 'ats' && t.count > 0 ? ` (${t.count}/${t.totalRoles} roles)` : '';
+                  return <span key={techName + idx} className="chip">{capTech}{countLabel}</span>;
                 })}
               </div>
               {lead.techSignalsEvidence && (

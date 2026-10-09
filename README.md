@@ -1,89 +1,70 @@
 # ProofLead
 
-ProofLead is an automated B2B lead enrichment and scoring tool. It solves the problem of sales teams wasting time on unverified, generic lead lists by programmatically extracting and verifying signals from public company data.
+ProofLead is an intelligent B2B Lead Scoring and Enrichment tool designed specifically for Private Equity sourcing and sales teams. It automatically scrapes target websites and job boards to detect growth signals, technology stacks, and ideal customer profile (ICP) fits.
 
-## How it works
-
-- **Data Fetching:** The system fetches the `/`, `/about`, and `/careers` pages of a company using an honest `ProofLeadBot` user-agent while strictly respecting `robots.txt` directives.
-- **Dynamic Rendering:** Puppeteer is used exclusively as a fallback for JS-rendered pages that return a `200 OK` status but lack static content.
-- **LLM Extraction:** HTML is stripped of navigational noise and sent to the Groq API (models defined in configuration) to extract structured firmographic data.
-- **Evidence Verification:** A strict verifier enforces that every extracted data point must include an exact, verbatim quote that physically exists in the scraped page text.
-- **ATS APIs:** If a supported ATS (Greenhouse, Lever, or Ashby) is detected on the careers page, the backend queries their public APIs to accurately extract open job counts and parse the tech stack via a whitelist regex.
-- **ICP Scoring:** Leads are evaluated against an Ideal Customer Profile (ICP). Signal coverage uses a dynamic denominator (x/4 if location targets are excluded from the ICP, x/5 otherwise). Strict score caps are applied based on this coverage (e.g., maximum score of 80 for 3 signals). High Priority requires at least 4 signals (including size).
-- **Caching & Storage:** Enrichment results are stored persistently in a local SQLite database (`backend/data/leads.db`).
-- **CSV Fallback:** If the website doesn't state employee size or industry, the tool seamlessly merges fallback data from the uploaded CSV and labels it "from CSV".
-- **Dashboard & Filters:** The React frontend provides a robust results dashboard with advanced filtering by score, status, industry, hiring signals, and confidence.
-- **Export:** Enriched data can be exported to a CSV file ready for CRM systems like HubSpot.
-
-## Known limitations
-
-- The verifier checks that a quote exists verbatim in the text, but it does not contextually verify that the quote proves the claim (e.g., a real but irrelevant quote might be accepted).
-- The company industry is inferred by the LLM from the product description and marked with an `industryInferred` flag, which is an approximation.
-- Hiring metrics and tech stacks are currently only extracted if the company uses Greenhouse, Lever, or Ashby.
-- Bulk processing is heavily constrained by the Groq API's daily token and rate limits.
-
-## Ethics
-
-- **Honest Bot:** Uses an honest User-Agent (`ProofLeadBot/1.0 (+https://github.com/Naveen34822/ProofLead)`) with a clear contact link.
-- **Respectful Crawling:** Fully respects `robots.txt` and does not scrape disallowed paths.
-- **No Evasion:** The system will not attempt IP rotation, proxy networks, or evasion techniques when encountering `403 Forbidden` or `429 Too Many Requests`.
-- **No PII:** The system processes zero Personally Identifiable Information (PII) and focuses exclusively on firmographic data.
+	## Why ProofLead? (Caprae Capital)
+For PE sourcing, growth signals are key indicators of a company's acquisition readiness. We specifically look at:
+- **Hiring Signals**: Companies actively hiring for engineering, product, or data roles are investing in product growth.
+- **Technology Stack**: Automatically reverse-engineering a company's tech stack by parsing their applicant tracking system (ATS) reveals their technical maturity without needing a technical discovery call.
+ProofLead automates these exact lookups, making it an essential tool for evaluating Caprae's targets.
 
 ## Architecture
+ProofLead is built as a single monolithic service optimized for quick deployment and low costs:
+- **Backend**: Node.js Express service acting as both the API server and static file host.
+- **Frontend**: React (Vite) single-page application built into `frontend/dist` and served by Express.
+- **Database (SQLite)**: Uses `better-sqlite3` with `leads.db` for caching and tracking usage. 
+- **LLM Engine**: Powered by Groq (`openai/gpt-oss-120b`) for lightning-fast text extraction and inference.
+- **Hosting**: Designed to be deployed on Render's Web Service (Free tier compatible).
 
-- **Backend:** Node.js and Express.
-- **Frontend:** React and Vite.
-- **Database:** SQLite (`better-sqlite3`).
-- **Hosting / Deployment / Cloud Provider:** [Fill after deploy]
+	### Caching Strategy & Cost Management
+To manage LLM API costs and mitigate the Render free tier's ephemeral filesystem:
+- **Daily Global Caps**: Enforced by a `daily_stats` SQLite table. Stops live LLM queries after a certain threshold.
+- **Per-IP Rate Limitq**: Prevents individual users from exhausting the API quota.
+- **Ephemeral Auto-seeding**: Since Render wipes the local `leads.db` filesystem on every deploy, the app automatically detects an empty database on startup and seeds it from `backend/seed/leads.json`. This ensures reviewers always have a rich dataset to interact with.
 
-## Setup
+## Limitations & Ethical Data Collection
+- **Public Data Only**: ProofLead strictly relies on public website data and respects `robots.txt`. No personal data (PII) is scraped or stored.
+- **Job Board Constraints**: ATS signals (Tech stack & Hiring) are only extracted if the company uses Greenhouse, Lever, or AshbyHQ. Companies using proprietary boards or hidden pages (like Loom after their Atlassian acquisition) will gracefully degrade to "Not found".
+- **Headless Browser Constraints**: To run efficiently on Render without huge memory overhead, Puppeteer rendering is disabled in production. HighlyJS-dependent websites may yield thin extraction results.
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Naveen34822/ProofLead.git
-   cd ProofLead
-   ```
-2. Install dependencies for the root, frontend, and backend:
-   ```bash
+## Setup & Run Instructions
+
+### Prerequisites
+- Node.js (v20.x recommended)
+- A Groq API Key
+
+### Local Setup
+1. Install all dependencies from the root directory:
+   ``bash
    npm run install:all
    ```
-3. Copy the example environment variables and add your Groq API key:
-   ```bash
-   cp .env.example .env
-   # Edit .env and set GROQ_API_KEY=your_key
+2. Build the frontend application:
+   ``bash
+   npm run build
    ```
-4. Start the application stack (both frontend and backend concurrently):
-   ```bash
-   npm run dev
+3. Set up environment variables. Create a `.env` file in the root directory:
+   ```env
+   GROQ_API_KEY=your_key_here
+   GROQ_MODEL=openai/gpt-oss-120b
+   PUPPETEER_ENABLED=true
+   DAILY_LIVE_CAP=25
+   PER_IP_LIVE_CAP=5
+   PORT=3001
    ```
-5. To run the evidence verifier tests:
+4. Start the monolithic server:
    ```bash
-   cd backend
-   npm run test
+   npm start
    ```
+   Navigate to `http://localhost:3001`.
 
-## Dataset
-
-- **File:** `20_enriched_test_leads.csv`
-- **Collection Date:** October 9, 2026
-- **User-Agent:** `ProofLeadBot/1.0 (+https://github.com/Naveen34822/ProofLead)`
-
-## Time spent
-
-Approximately 18 hours.
-
-
-## Hosted Demo (Render)
-When deploying ProofLead on Render (Web Service):
-- **Puppeteer** is disabled () as it requires extra dependencies.
-- **Database**: We use SQLite () instead of a JSON cache. On a fresh deployment, the database is automatically seeded from .
-- **Caps**: To prevent abuse on the demo, a global daily cap is set via  (default 25) and an IP-based cap via  (default 5).
-
-### Environment Variables
-- : Your Groq API key
-- : Model to use (default: )
-- : Set to  on Render, defaults to  locally
-- : Path to the SQLite database (e.g. )
-- : Global daily live enrichments limit
-- : Per-IP limit for live enrichments
-- : Port to run the server
+### Render Deployment
+Deploy as a **Web Service** on Render with the following configuration:
+- **Build Command**: `npm run install:all && npm run build`
+- **Start Command**: `npm start`
+- **Environment Variables**:
+  - `NODE_ENV=production`
+  - `GROQ_API_KEY=your_key`
+  - `GROQ_MODEL=openai/gpt-oss-120b`
+  - `PUPPETEER_ENABLED=false` (To save memory)
+  - `DAILY_LIVE_CAP=25`
+  - `PER_IP_LIVE_CAP=5`
