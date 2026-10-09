@@ -1,0 +1,1600 @@
+[
+  {
+    "domain": "notion.so 2",
+    "data": {
+      "industry": "Productivity",
+      "industryEvidence": "We want to break away from today’s tools—and bring back some of the ideas of those early pioneers. As a first step, we are blending much of your workflow into an all-in-one workspace.",
+      "industryInferred": true,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [
+        "typescript",
+        "go",
+        "python",
+        "node",
+        "node.js",
+        "java",
+        "javascript",
+        "aws",
+        "gcp",
+        "kubernetes",
+        "azure",
+        "mysql",
+        "c++",
+        "react",
+        "elasticsearch",
+        "terraform",
+        "snowflake",
+        "mongodb",
+        "docker",
+        "spark",
+        "kafka",
+        "rust",
+        "swift",
+        "kotlin"
+      ],
+      "techSignalsEvidence": "Found in ATS job description for Software Engineer, Developer Platform",
+      "hiringSignals": true,
+      "hiringSignalsEvidence": "https://jobs.ashbyhq.com/notion/8b82e596-e828-45db-94d5-b76acc89e749",
+      "hiringJobCount": 133,
+      "location": "San Francisco, United States",
+      "locationEvidence": "Notion is based in beautiful downtown San Francisco",
+      "confidence": "medium",
+      "enrichmentSource": "live",
+      "textLength": 7254,
+      "sources": {
+        "home": "https://notion.so",
+        "about": "https://notion.so/about",
+        "careers": "https://notion.so/careers"
+      },
+      "fetchedAt": "2026-10-09T05:11:50.059Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "Productivity",
+          "industryEvidence": "We want to break away from today’s tools—and bring back some of the ideas of those early pioneers. As a first step, we are blending much of your workflow into an all-in-one workspace.",
+          "industryInferred": true,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [
+            "typescript",
+            "go",
+            "python",
+            "node",
+            "node.js",
+            "java",
+            "javascript",
+            "aws",
+            "gcp",
+            "kubernetes",
+            "azure",
+            "mysql",
+            "c++",
+            "react",
+            "elasticsearch",
+            "terraform",
+            "snowflake",
+            "mongodb",
+            "docker",
+            "spark",
+            "kafka",
+            "rust",
+            "swift",
+            "kotlin"
+          ],
+          "techSignalsEvidence": "Found in ATS job description for Software Engineer, Developer Platform",
+          "hiringSignals": true,
+          "hiringSignalsEvidence": "https://jobs.ashbyhq.com/notion/8b82e596-e828-45db-94d5-b76acc89e749",
+          "hiringJobCount": 133,
+          "location": "San Francisco, United States",
+          "locationEvidence": "Notion is based in beautiful downtown San Francisco"
+        },
+        "rejectedFields": []
+      }
+    }
+  },
+  {
+    "domain": "notion.so",
+    "data": {
+      "industry": "Productivity",
+      "industryEvidence": "The AI workspace where teams get more done, faster.",
+      "industryInferred": false,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [
+        {
+          "tech": "node.js",
+          "count": 23,
+          "totalRoles": 36
+        },
+        {
+          "tech": "python",
+          "count": 16,
+          "totalRoles": 36
+        },
+        {
+          "tech": "typescript",
+          "count": 14,
+          "totalRoles": 36
+        },
+        {
+          "tech": "react",
+          "count": 9,
+          "totalRoles": 36
+        },
+        {
+          "tech": "aws",
+          "count": 7,
+          "totalRoles": 36
+        },
+        {
+          "tech": "java",
+          "count": 6,
+          "totalRoles": 36
+        },
+        {
+          "tech": "javascript",
+          "count": 6,
+          "totalRoles": 36
+        },
+        {
+          "tech": "gcp",
+          "count": 5,
+          "totalRoles": 36
+        },
+        {
+          "tech": "azure",
+          "count": 5,
+          "totalRoles": 36
+        },
+        {
+          "tech": "mysql",
+          "count": 5,
+          "totalRoles": 36
+        },
+        {
+          "tech": "kubernetes",
+          "count": 3,
+          "totalRoles": 36
+        },
+        {
+          "tech": "go",
+          "count": 3,
+          "totalRoles": 36
+        },
+        {
+          "tech": "elasticsearch",
+          "count": 3,
+          "totalRoles": 36
+        },
+        {
+          "tech": "rust",
+          "count": 3,
+          "totalRoles": 36
+        }
+      ],
+      "techSignalsEvidence": "Found in ATS: node.js in 23 of 36 engineering/product roles",
+      "hiringSignals": true,
+      "hiringSignalsEvidence": "https://jobs.ashbyhq.com/notion/8b82e596-e828-45db-94d5-b76acc89e749",
+      "hiringJobCount": 133,
+      "location": "San Francisco, USA",
+      "locationEvidence": "Notion is based in beautiful downtown San Francisco, with offices around the world.",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "The AI workspace that works for you.",
+      "confidence": "medium",
+      "enrichmentSource": "live",
+      "textLength": 7564,
+      "pageTextLengths": {
+        "home": 1534,
+        "about": 3000,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://notion.so",
+        "about": "https://notion.so/about",
+        "careers": "https://notion.so/careers"
+      },
+      "fetchedAt": "2026-10-09T06:24:00.506Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "Productivity",
+          "industryEvidence": "The AI workspace where teams get more done, faster.",
+          "industryInferred": false,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [
+            {
+              "tech": "node.js",
+              "count": 23,
+              "totalRoles": 36
+            },
+            {
+              "tech": "python",
+              "count": 16,
+              "totalRoles": 36
+            },
+            {
+              "tech": "typescript",
+              "count": 14,
+              "totalRoles": 36
+            },
+            {
+              "tech": "react",
+              "count": 9,
+              "totalRoles": 36
+            },
+            {
+              "tech": "aws",
+              "count": 7,
+              "totalRoles": 36
+            },
+            {
+              "tech": "java",
+              "count": 6,
+              "totalRoles": 36
+            },
+            {
+              "tech": "javascript",
+              "count": 6,
+              "totalRoles": 36
+            },
+            {
+              "tech": "gcp",
+              "count": 5,
+              "totalRoles": 36
+            },
+            {
+              "tech": "azure",
+              "count": 5,
+              "totalRoles": 36
+            },
+            {
+              "tech": "mysql",
+              "count": 5,
+              "totalRoles": 36
+            },
+            {
+              "tech": "kubernetes",
+              "count": 3,
+              "totalRoles": 36
+            },
+            {
+              "tech": "go",
+              "count": 3,
+              "totalRoles": 36
+            },
+            {
+              "tech": "elasticsearch",
+              "count": 3,
+              "totalRoles": 36
+            },
+            {
+              "tech": "rust",
+              "count": 3,
+              "totalRoles": 36
+            }
+          ],
+          "techSignalsEvidence": "Found in ATS: node.js in 23 of 36 engineering/product roles",
+          "hiringSignals": true,
+          "hiringSignalsEvidence": "https://jobs.ashbyhq.com/notion/8b82e596-e828-45db-94d5-b76acc89e749",
+          "hiringJobCount": 133,
+          "location": "San Francisco, USA",
+          "locationEvidence": "Notion is based in beautiful downtown San Francisco, with offices around the world.",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "The AI workspace that works for you."
+        },
+        "rejectedFields": [],
+        "tokens": 2908
+      }
+    }
+  },
+  {
+    "domain": "snowflake.com",
+    "data": {
+      "industry": "Cloud Infrastructure",
+      "industryEvidence": "\"The Snowflake platform is a fully managed service that’s truly easy to use, connected across your entire data estate and trusted by thousands of customers.\"",
+      "industryInferred": true,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 11161 chars)",
+      "hiringJobCount": 0,
+      "location": "unknown",
+      "locationEvidence": "Not found on fetched pages",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "\"The Snowflake platform is a fully managed service that’s truly easy to use, connected across your entire data estate and trusted by thousands of customers.\"",
+      "confidence": "low",
+      "enrichmentSource": "live",
+      "textLength": 11161,
+      "pageTextLengths": {
+        "home": 6000,
+        "about": 3000,
+        "careers": 2131
+      },
+      "sources": {
+        "home": "https://snowflake.com",
+        "about": "https://snowflake.com/about",
+        "careers": "https://snowflake.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:21:00.050Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "Cloud Infrastructure",
+          "industryEvidence": "\"The Snowflake platform is a fully managed service that’s truly easy to use, connected across your entire data estate and trusted by thousands of customers.\"",
+          "industryInferred": true,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [],
+          "techSignalsEvidence": "unknown",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "unknown",
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "\"The Snowflake platform is a fully managed service that’s truly easy to use, connected across your entire data estate and trusted by thousands of customers.\""
+        },
+        "rejectedFields": [],
+        "tokens": 3562
+      }
+    }
+  },
+  {
+    "domain": "stripe.com",
+    "data": {
+      "industry": "FinTech",
+      "industryEvidence": "We build programmable financial infrastructure, rethinking from first principles how financial services should work, to make it easier and cheaper for any business to start and scale.",
+      "industryInferred": true,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 11100 chars)",
+      "hiringJobCount": 0,
+      "location": "unknown",
+      "locationEvidence": "Not found on fetched pages",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "Accept payments, offer financial services and implement custom revenue models – from your first transaction to your billionth.",
+      "confidence": "low",
+      "enrichmentSource": "live",
+      "textLength": 11100,
+      "pageTextLengths": {
+        "home": 6000,
+        "about": 2070,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://stripe.com",
+        "about": "https://stripe.com/about",
+        "careers": "https://stripe.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:21:01.316Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "FinTech",
+          "industryEvidence": "We build programmable financial infrastructure, rethinking from first principles how financial services should work, to make it easier and cheaper for any business to start and scale.",
+          "industryInferred": true,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [],
+          "techSignalsEvidence": "unknown",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "unknown",
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "Accept payments, offer financial services and implement custom revenue models – from your first transaction to your billionth."
+        },
+        "rejectedFields": [],
+        "tokens": 3590
+      }
+    }
+  },
+  {
+    "domain": "twilio.com",
+    "data": {
+      "industry": "Communication",
+      "industryEvidence": "The Twilio platform empowers humans and AI agents to work together, coordinate across channels, and pick up every customer conversation where the last one left off.",
+      "industryInferred": true,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 9030 chars)",
+      "hiringJobCount": 0,
+      "location": "unknown",
+      "locationEvidence": "Not found on fetched pages",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "Flexible pricing",
+      "confidence": "low",
+      "enrichmentSource": "live",
+      "textLength": 9030,
+      "pageTextLengths": {
+        "home": 6000,
+        "about": 0,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://twilio.com",
+        "about": "https://twilio.com/about",
+        "careers": "https://twilio.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:21:27.307Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "Communication",
+          "industryEvidence": "The Twilio platform empowers humans and AI agents to work together, coordinate across channels, and pick up every customer conversation where the last one left off.",
+          "industryInferred": true,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [
+            {
+              "tech": "python",
+              "count": 0,
+              "totalRoles": 0
+            },
+            {
+              "tech": "c#",
+              "count": 0,
+              "totalRoles": 0
+            },
+            {
+              "tech": "php",
+              "count": 0,
+              "totalRoles": 0
+            },
+            {
+              "tech": "ruby",
+              "count": 0,
+              "totalRoles": 0
+            },
+            {
+              "tech": "java",
+              "count": 0,
+              "totalRoles": 0
+            }
+          ],
+          "techSignalsEvidence": "import os from twilio.rest import Client ... using System; using Twilio; using Twilio.Rest.Api.V2010.Account;",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "unknown",
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "Flexible pricing"
+        },
+        "rejectedFields": [
+          {
+            "field": "techSignals",
+            "value": [
+              {
+                "tech": "python",
+                "count": 0,
+                "totalRoles": 0
+              },
+              {
+                "tech": "c#",
+                "count": 0,
+                "totalRoles": 0
+              },
+              {
+                "tech": "php",
+                "count": 0,
+                "totalRoles": 0
+              },
+              {
+                "tech": "ruby",
+                "count": 0,
+                "totalRoles": 0
+              },
+              {
+                "tech": "java",
+                "count": 0,
+                "totalRoles": 0
+              }
+            ],
+            "reason": "Quote not found in text: \"import os from twilio.rest import Client ... using System; using Twilio; using Twilio.Rest.Api.V2010.Account;\""
+          }
+        ],
+        "tokens": 4170
+      }
+    }
+  },
+  {
+    "domain": "vercel.com",
+    "data": {
+      "industry": "DevTools",
+      "industryEvidence": "At Vercel, our mission is to enable developers to build and publish wonderful, high-performant apps and websites.",
+      "industryInferred": true,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 5882 chars)",
+      "hiringJobCount": 0,
+      "location": "unknown",
+      "locationEvidence": "Not found on fetched pages",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "Vercel is agentic infrastructure for every app and agent.",
+      "confidence": "low",
+      "enrichmentSource": "live",
+      "textLength": 5882,
+      "pageTextLengths": {
+        "home": 1121,
+        "about": 1731,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://vercel.com",
+        "about": "https://vercel.com/about",
+        "careers": "https://vercel.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:21:49.576Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "DevTools",
+          "industryEvidence": "At Vercel, our mission is to enable developers to build and publish wonderful, high-performant apps and websites.",
+          "industryInferred": true,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [
+            {
+              "tech": "react",
+              "count": 0,
+              "totalRoles": 0
+            },
+            {
+              "tech": "next.js",
+              "count": 0,
+              "totalRoles": 0
+            },
+            {
+              "tech": "docker",
+              "count": 0,
+              "totalRoles": 0
+            }
+          ],
+          "techSignalsEvidence": "Jordan Walke Creator of React; Engineering Manager - Next.js; Building image from Dockerfile.vercel",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "unknown",
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "Vercel is agentic infrastructure for every app and agent."
+        },
+        "rejectedFields": [
+          {
+            "field": "techSignals",
+            "value": [
+              {
+                "tech": "react",
+                "count": 0,
+                "totalRoles": 0
+              },
+              {
+                "tech": "next.js",
+                "count": 0,
+                "totalRoles": 0
+              },
+              {
+                "tech": "docker",
+                "count": 0,
+                "totalRoles": 0
+              }
+            ],
+            "reason": "Quote not found in text: \"Jordan Walke Creator of React; Engineering Manager - Next.js; Building image from Dockerfile.vercel\""
+          }
+        ],
+        "tokens": 2598
+      }
+    }
+  },
+  {
+    "domain": "datadoghq.com",
+    "data": {
+      "industry": "DevTools",
+      "industryEvidence": "We are building the monitoring and security platform for developers, IT operations teams and business users in the cloud age.",
+      "industryInferred": true,
+      "employeeSize": "8000+",
+      "employeeSizeEvidence": "Our 8,100+ employees help organizations across the globe",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 12030 chars)",
+      "hiringJobCount": 0,
+      "location": "unknown",
+      "locationEvidence": "Not found on fetched pages",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "We are building the monitoring and security platform for developers, IT operations teams and business users in the cloud age.",
+      "confidence": "medium",
+      "enrichmentSource": "live",
+      "textLength": 12030,
+      "pageTextLengths": {
+        "home": 6000,
+        "about": 3000,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://datadoghq.com",
+        "about": "https://datadoghq.com/about",
+        "careers": "https://datadoghq.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:22:17.508Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "DevTools",
+          "industryEvidence": "We are building the monitoring and security platform for developers, IT operations teams and business users in the cloud age.",
+          "industryInferred": true,
+          "employeeSize": "8000+",
+          "employeeSizeEvidence": "Our 8,100+ employees help organizations across the globe",
+          "techSignals": [
+            {
+              "tech": "aws",
+              "count": 0,
+              "totalRoles": 0
+            },
+            {
+              "tech": "azure",
+              "count": 0,
+              "totalRoles": 0
+            },
+            {
+              "tech": "kubernetes",
+              "count": 0,
+              "totalRoles": 0
+            },
+            {
+              "tech": "postgresql",
+              "count": 0,
+              "totalRoles": 0
+            }
+          ],
+          "techSignalsEvidence": "Amazon Web Services Monitoring Azure Monitoring Google Cloud Monitoring Oracle Cloud Monitoring Kubernetes Monitoring Red Hat OpenShift ... State of Postgres",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "unknown",
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "We are building the monitoring and security platform for developers, IT operations teams and business users in the cloud age."
+        },
+        "rejectedFields": [
+          {
+            "field": "techSignals",
+            "value": [
+              {
+                "tech": "aws",
+                "count": 0,
+                "totalRoles": 0
+              },
+              {
+                "tech": "azure",
+                "count": 0,
+                "totalRoles": 0
+              },
+              {
+                "tech": "kubernetes",
+                "count": 0,
+                "totalRoles": 0
+              },
+              {
+                "tech": "postgresql",
+                "count": 0,
+                "totalRoles": 0
+              }
+            ],
+            "reason": "Quote not found in text: \"Amazon Web Services Monitoring Azure Monitoring Google Cloud Monitoring Oracle Cloud Monitoring Kubernetes Monitoring Red Hat OpenShift ... State of Postgres\""
+          }
+        ],
+        "tokens": 4172
+      }
+    }
+  },
+  {
+    "domain": "postman.com",
+    "data": {
+      "industry": "DevTools",
+      "industryEvidence": "Postman is an API platform for building and using APIs.",
+      "industryInferred": true,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 9099 chars)",
+      "hiringJobCount": 0,
+      "location": "unknown",
+      "locationEvidence": "Not found on fetched pages",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "Postman is an API platform for building and using APIs.",
+      "confidence": "low",
+      "enrichmentSource": "live",
+      "textLength": 9099,
+      "pageTextLengths": {
+        "home": 3069,
+        "about": 3000,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://postman.com",
+        "about": "https://postman.com/about",
+        "careers": "https://postman.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:22:44.142Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "DevTools",
+          "industryEvidence": "Postman is an API platform for building and using APIs.",
+          "industryInferred": true,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [],
+          "techSignalsEvidence": "unknown",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "unknown",
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "Postman is an API platform for building and using APIs."
+        },
+        "rejectedFields": [],
+        "tokens": 3209
+      }
+    }
+  },
+  {
+    "domain": "retool.com",
+    "data": {
+      "industry": "SaaS",
+      "industryEvidence": "We’re building tools for companies to develop better software faster.",
+      "industryInferred": true,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [
+        {
+          "tech": "react",
+          "count": 0,
+          "totalRoles": 0
+        }
+      ],
+      "techSignalsEvidence": "Import React code",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 8852 chars)",
+      "hiringJobCount": 0,
+      "location": "unknown",
+      "locationEvidence": "Not found on fetched pages",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "We’re building tools for companies to develop better software faster.",
+      "confidence": "medium",
+      "enrichmentSource": "live",
+      "textLength": 8852,
+      "pageTextLengths": {
+        "home": 2822,
+        "about": 3000,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://retool.com",
+        "about": "https://retool.com/about",
+        "careers": "https://retool.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:23:14.352Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "SaaS",
+          "industryEvidence": "We’re building tools for companies to develop better software faster.",
+          "industryInferred": true,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [
+            {
+              "tech": "react",
+              "count": 0,
+              "totalRoles": 0
+            }
+          ],
+          "techSignalsEvidence": "Import React code",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "unknown",
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "We’re building tools for companies to develop better software faster."
+        },
+        "rejectedFields": [],
+        "tokens": 3002
+      }
+    }
+  },
+  {
+    "domain": "webflow.com",
+    "data": {
+      "industry": "SaaS",
+      "industryEvidence": "Webflow gives every team the tools to build, manage, and grow a website that drives real revenue.",
+      "industryInferred": true,
+      "employeeSize": "900+",
+      "employeeSizeEvidence": "900+ Team members in 25 countries",
+      "techSignals": [
+        {
+          "tech": "javascript",
+          "count": 0,
+          "totalRoles": 0
+        }
+      ],
+      "techSignalsEvidence": "Webflow acquires JavaScript library GSAP",
+      "hiringSignals": true,
+      "hiringSignalsEvidence": "https://job-boards.greenhouse.io/webflow/jobs/8167866",
+      "hiringJobCount": 22,
+      "location": "unknown",
+      "locationEvidence": "Not found on fetched pages",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "visual development platform that allows you to build with the full power of code, without writing it",
+      "confidence": "high",
+      "enrichmentSource": "live",
+      "textLength": 11348,
+      "pageTextLengths": {
+        "home": 6000,
+        "about": 2318,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://webflow.com",
+        "about": "https://webflow.com/about",
+        "careers": "https://webflow.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:23:39.468Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "SaaS",
+          "industryEvidence": "Webflow gives every team the tools to build, manage, and grow a website that drives real revenue.",
+          "industryInferred": true,
+          "employeeSize": "900+",
+          "employeeSizeEvidence": "900+ Team members in 25 countries",
+          "techSignals": [
+            {
+              "tech": "javascript",
+              "count": 0,
+              "totalRoles": 0
+            }
+          ],
+          "techSignalsEvidence": "Webflow acquires JavaScript library GSAP",
+          "hiringSignals": true,
+          "hiringSignalsEvidence": "https://job-boards.greenhouse.io/webflow/jobs/8167866",
+          "hiringJobCount": 22,
+          "location": "unknown",
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "visual development platform that allows you to build with the full power of code, without writing it"
+        },
+        "rejectedFields": [],
+        "tokens": 3569
+      }
+    }
+  },
+  {
+    "domain": "supabase.com",
+    "data": {
+      "industry": "DevTools",
+      "industryEvidence": "\"Supabase is the Postgres development platform, built by developers for developers.\"",
+      "industryInferred": true,
+      "employeeSize": "350+",
+      "employeeSizeEvidence": "\"350+ team members in 60+ countries\"",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": true,
+      "hiringSignalsEvidence": "https://jobs.ashbyhq.com/supabase/form/talent-community-form",
+      "hiringJobCount": 52,
+      "location": "unknown",
+      "locationEvidence": "\"There are no Supabase offices\"",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "\"Supabase is the Postgres development platform, built by developers for developers.\"",
+      "confidence": "medium",
+      "enrichmentSource": "live",
+      "textLength": 11336,
+      "pageTextLengths": {
+        "home": 6000,
+        "about": 2306,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://supabase.com",
+        "about": "https://supabase.com/about",
+        "careers": "https://supabase.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:24:09.204Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "DevTools",
+          "industryEvidence": "\"Supabase is the Postgres development platform, built by developers for developers.\"",
+          "industryInferred": true,
+          "employeeSize": "350+",
+          "employeeSizeEvidence": "\"350+ team members in 60+ countries\"",
+          "techSignals": [
+            {
+              "tech": "supabase",
+              "count": 38,
+              "totalRoles": 38
+            },
+            {
+              "tech": "aws",
+              "count": 16,
+              "totalRoles": 38
+            },
+            {
+              "tech": "postgresql",
+              "count": 13,
+              "totalRoles": 38
+            },
+            {
+              "tech": "javascript",
+              "count": 11,
+              "totalRoles": 38
+            },
+            {
+              "tech": "node.js",
+              "count": 10,
+              "totalRoles": 38
+            },
+            {
+              "tech": "react",
+              "count": 8,
+              "totalRoles": 38
+            },
+            {
+              "tech": "vue",
+              "count": 8,
+              "totalRoles": 38
+            },
+            {
+              "tech": "svelte",
+              "count": 8,
+              "totalRoles": 38
+            },
+            {
+              "tech": "typescript",
+              "count": 8,
+              "totalRoles": 38
+            },
+            {
+              "tech": "go",
+              "count": 8,
+              "totalRoles": 38
+            },
+            {
+              "tech": "kubernetes",
+              "count": 7,
+              "totalRoles": 38
+            },
+            {
+              "tech": "terraform",
+              "count": 6,
+              "totalRoles": 38
+            },
+            {
+              "tech": "python",
+              "count": 4,
+              "totalRoles": 38
+            },
+            {
+              "tech": "next.js",
+              "count": 4,
+              "totalRoles": 38
+            },
+            {
+              "tech": "rust",
+              "count": 4,
+              "totalRoles": 38
+            },
+            {
+              "tech": "gcp",
+              "count": 3,
+              "totalRoles": 38
+            },
+            {
+              "tech": "remix",
+              "count": 3,
+              "totalRoles": 38
+            },
+            {
+              "tech": "prometheus",
+              "count": 3,
+              "totalRoles": 38
+            },
+            {
+              "tech": "grafana",
+              "count": 3,
+              "totalRoles": 38
+            }
+          ],
+          "techSignalsEvidence": "\"Use Supabase with React import { createClient } from '@supabase/supabase-js'\" \"Next.js Starter A Next.js App Router template configured with cookie-based auth using Supabase, TypeScript and Tailwind CSS.\" \"Flutter User Management Get started with Supabase and Flutter by building a user management app\" \"Expo React Native Starter\" | Found in ATS: supabase in 38 of 38 engineering/product roles",
+          "hiringSignals": true,
+          "hiringSignalsEvidence": "https://jobs.ashbyhq.com/supabase/form/talent-community-form",
+          "hiringJobCount": 52,
+          "location": "unknown",
+          "locationEvidence": "\"There are no Supabase offices\"",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "\"Supabase is the Postgres development platform, built by developers for developers.\""
+        },
+        "rejectedFields": [
+          {
+            "field": "techSignals",
+            "value": [
+              {
+                "tech": "supabase",
+                "count": 38,
+                "totalRoles": 38
+              },
+              {
+                "tech": "aws",
+                "count": 16,
+                "totalRoles": 38
+              },
+              {
+                "tech": "postgresql",
+                "count": 13,
+                "totalRoles": 38
+              },
+              {
+                "tech": "javascript",
+                "count": 11,
+                "totalRoles": 38
+              },
+              {
+                "tech": "node.js",
+                "count": 10,
+                "totalRoles": 38
+              },
+              {
+                "tech": "react",
+                "count": 8,
+                "totalRoles": 38
+              },
+              {
+                "tech": "vue",
+                "count": 8,
+                "totalRoles": 38
+              },
+              {
+                "tech": "svelte",
+                "count": 8,
+                "totalRoles": 38
+              },
+              {
+                "tech": "typescript",
+                "count": 8,
+                "totalRoles": 38
+              },
+              {
+                "tech": "go",
+                "count": 8,
+                "totalRoles": 38
+              },
+              {
+                "tech": "kubernetes",
+                "count": 7,
+                "totalRoles": 38
+              },
+              {
+                "tech": "terraform",
+                "count": 6,
+                "totalRoles": 38
+              },
+              {
+                "tech": "python",
+                "count": 4,
+                "totalRoles": 38
+              },
+              {
+                "tech": "next.js",
+                "count": 4,
+                "totalRoles": 38
+              },
+              {
+                "tech": "rust",
+                "count": 4,
+                "totalRoles": 38
+              },
+              {
+                "tech": "gcp",
+                "count": 3,
+                "totalRoles": 38
+              },
+              {
+                "tech": "remix",
+                "count": 3,
+                "totalRoles": 38
+              },
+              {
+                "tech": "prometheus",
+                "count": 3,
+                "totalRoles": 38
+              },
+              {
+                "tech": "grafana",
+                "count": 3,
+                "totalRoles": 38
+              }
+            ],
+            "reason": "Quote not found in text: \"\"Use Supabase with React import { createClient } from '@supabase/supabase-js'\" \"Next.js Starter A Next.js App Router template configured with cookie-based auth using Supabase, TypeScript and Tailwind CSS.\" \"Flutter User Management Get started with Supabase and Flutter by building a user management app\" \"Expo React Native Starter\" | Found in ATS: supabase in 38 of 38 engineering/product roles\""
+          }
+        ],
+        "tokens": 4655
+      }
+    }
+  },
+  {
+    "domain": "canva.com",
+    "data": {
+      "industry": "Productivity",
+      "industryEvidence": "Canva is an online design and publishing tool with a mission to empower everyone in the world to design anything and publish anywhere.",
+      "industryInferred": true,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 6440 chars)",
+      "hiringJobCount": 0,
+      "location": "unknown",
+      "locationEvidence": "Not found on fetched pages",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "Canva is an online design and publishing tool with a mission to empower everyone in the world to design anything and publish anywhere.",
+      "confidence": "low",
+      "enrichmentSource": "live",
+      "textLength": 6440,
+      "pageTextLengths": {
+        "home": 410,
+        "about": 3000,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://canva.com",
+        "about": "https://canva.com/about",
+        "careers": "https://canva.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:24:20.683Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "Productivity",
+          "industryEvidence": "Canva is an online design and publishing tool with a mission to empower everyone in the world to design anything and publish anywhere.",
+          "industryInferred": true,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [],
+          "techSignalsEvidence": "unknown",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "unknown",
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "Canva is an online design and publishing tool with a mission to empower everyone in the world to design anything and publish anywhere."
+        },
+        "rejectedFields": [],
+        "tokens": 2728
+      }
+    }
+  },
+  {
+    "domain": "airtable.com",
+    "data": {
+      "industry": "Productivity",
+      "industryEvidence": "All your teams, all their workflows—connected in one workspace",
+      "industryInferred": true,
+      "employeeSize": "700",
+      "employeeSizeEvidence": "Where we work 700 people, 5 offices",
+      "techSignals": [
+        {
+          "tech": "aws",
+          "count": 0,
+          "totalRoles": 0
+        }
+      ],
+      "techSignalsEvidence": "Models run fully in Airtable’s AWS environment",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 7795 chars)",
+      "hiringJobCount": 0,
+      "location": "San Francisco, USA",
+      "locationEvidence": "San Francisco HQ",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "All your teams, all their workflows—connected in one workspace",
+      "confidence": "high",
+      "enrichmentSource": "live",
+      "textLength": 7795,
+      "pageTextLengths": {
+        "home": 2993,
+        "about": 1772,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://airtable.com",
+        "about": "https://airtable.com/about",
+        "careers": "https://airtable.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:24:38.914Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "Productivity",
+          "industryEvidence": "All your teams, all their workflows—connected in one workspace",
+          "industryInferred": true,
+          "employeeSize": "700",
+          "employeeSizeEvidence": "Where we work 700 people, 5 offices",
+          "techSignals": [
+            {
+              "tech": "aws",
+              "count": 0,
+              "totalRoles": 0
+            }
+          ],
+          "techSignalsEvidence": "Models run fully in Airtable’s AWS environment",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "San Francisco, USA",
+          "locationEvidence": "San Francisco HQ",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "All your teams, all their workflows—connected in one workspace"
+        },
+        "rejectedFields": [],
+        "tokens": 3039
+      }
+    }
+  },
+  {
+    "domain": "loom.com",
+    "data": {
+      "industry": "Communication",
+      "industryEvidence": "Loom amplifies my communication with the team like nothing else has. It's a communication tool that should be in every executive's toolbox.",
+      "industryInferred": false,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 5137 chars)",
+      "hiringJobCount": 0,
+      "location": "San Francisco, USA",
+      "locationEvidence": "Principal Data Scientist, Loom San Francisco or Remote",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "Get Loom for free",
+      "confidence": "low",
+      "enrichmentSource": "live",
+      "textLength": 5137,
+      "pageTextLengths": {
+        "home": 2107,
+        "about": 0,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://loom.com",
+        "about": "https://loom.com/about",
+        "careers": "https://loom.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:25:02.781Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "Communication",
+          "industryEvidence": "Loom amplifies my communication with the team like nothing else has. It's a communication tool that should be in every executive's toolbox.",
+          "industryInferred": false,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [],
+          "techSignalsEvidence": "unknown",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "San Francisco, USA",
+          "locationEvidence": "Principal Data Scientist, Loom San Francisco or Remote",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "Get Loom for free"
+        },
+        "rejectedFields": [],
+        "tokens": 2434
+      }
+    }
+  },
+  {
+    "domain": "linear.app",
+    "data": {
+      "industry": "SaaS",
+      "industryEvidence": "The product development system for teams and agents",
+      "industryInferred": true,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 12030 chars)",
+      "hiringJobCount": 0,
+      "location": "unknown",
+      "locationEvidence": "Not found on fetched pages",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "The product development system for teams and agents",
+      "confidence": "low",
+      "enrichmentSource": "live",
+      "textLength": 12030,
+      "pageTextLengths": {
+        "home": 6000,
+        "about": 3000,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://linear.app",
+        "about": "https://linear.app/about",
+        "careers": "https://linear.app/careers"
+      },
+      "fetchedAt": "2026-10-09T06:25:14.882Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "SaaS",
+          "industryEvidence": "The product development system for teams and agents",
+          "industryInferred": true,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [],
+          "techSignalsEvidence": "unknown",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "unknown",
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "The product development system for teams and agents"
+        },
+        "rejectedFields": [],
+        "tokens": 4791
+      }
+    }
+  },
+  {
+    "domain": "figma.com",
+    "data": {
+      "industry": "Productivity",
+      "industryEvidence": "Figma is a design platform for teams who build products together.",
+      "industryInferred": true,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": true,
+      "hiringSignalsEvidence": "https://boards.greenhouse.io/figma/jobs/6073106004?gh_jid=6073106004",
+      "hiringJobCount": 153,
+      "location": "San Francisco, USA",
+      "locationEvidence": "Locations San Francisco New York City Seattle London Paris Berlin Tokyo Singapore Bengaluru Sydney São Paulo Tel Aviv",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "Figma is a design platform for teams who build products together.",
+      "confidence": "medium",
+      "enrichmentSource": "live",
+      "textLength": 6380,
+      "pageTextLengths": {
+        "home": 1675,
+        "about": 1675,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://figma.com",
+        "about": "https://figma.com/about",
+        "careers": "https://figma.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:25:22.436Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "Productivity",
+          "industryEvidence": "Figma is a design platform for teams who build products together.",
+          "industryInferred": true,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [],
+          "techSignalsEvidence": "unknown",
+          "hiringSignals": true,
+          "hiringSignalsEvidence": "https://boards.greenhouse.io/figma/jobs/6073106004?gh_jid=6073106004",
+          "hiringJobCount": 153,
+          "location": "San Francisco, USA",
+          "locationEvidence": "Locations San Francisco New York City Seattle London Paris Berlin Tokyo Singapore Bengaluru Sydney São Paulo Tel Aviv",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "Figma is a design platform for teams who build products together."
+        },
+        "rejectedFields": [],
+        "tokens": 2644
+      }
+    }
+  },
+  {
+    "domain": "ramp.com",
+    "data": {
+      "industry": "FinTech",
+      "industryEvidence": "We’re the all‑in‑one AI finance platform",
+      "industryInferred": true,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [
+        {
+          "tech": "python",
+          "count": 0,
+          "totalRoles": 0
+        }
+      ],
+      "techSignalsEvidence": "At 11, he was fluent in Python.",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 8271 chars)",
+      "hiringJobCount": 0,
+      "location": "New York City, USA",
+      "locationEvidence": "built the fastest-growing company in New York City",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "One platform for all of finance",
+      "confidence": "medium",
+      "enrichmentSource": "live",
+      "textLength": 8271,
+      "pageTextLengths": {
+        "home": 5241,
+        "about": 0,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://ramp.com",
+        "about": "https://ramp.com/about",
+        "careers": "https://ramp.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:25:45.497Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "FinTech",
+          "industryEvidence": "We’re the all‑in‑one AI finance platform",
+          "industryInferred": true,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [
+            {
+              "tech": "python",
+              "count": 0,
+              "totalRoles": 0
+            }
+          ],
+          "techSignalsEvidence": "At 11, he was fluent in Python.",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "New York City, USA",
+          "locationEvidence": "built the fastest-growing company in New York City",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "One platform for all of finance"
+        },
+        "rejectedFields": [],
+        "tokens": 3074
+      }
+    }
+  },
+  {
+    "domain": "deel.com",
+    "data": {
+      "industry": "HR Tech",
+      "industryEvidence": "the all‑in‑one HR platform for global teams",
+      "industryInferred": false,
+      "employeeSize": "4000+",
+      "employeeSizeEvidence": "In just under four years, the company has grown to 4,000+ team members worldwide",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 10522 chars)",
+      "hiringJobCount": 0,
+      "location": "unknown",
+      "locationEvidence": "Not found on fetched pages",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "the all‑in‑one HR platform for global teams",
+      "confidence": "medium",
+      "enrichmentSource": "live",
+      "textLength": 10522,
+      "pageTextLengths": {
+        "home": 4621,
+        "about": 3000,
+        "careers": 2871
+      },
+      "sources": {
+        "home": "https://deel.com",
+        "about": "https://deel.com/about",
+        "careers": "https://deel.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:26:07.957Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "HR Tech",
+          "industryEvidence": "the all‑in‑one HR platform for global teams",
+          "industryInferred": false,
+          "employeeSize": "4000+",
+          "employeeSizeEvidence": "In just under four years, the company has grown to 4,000+ team members worldwide",
+          "techSignals": [],
+          "techSignalsEvidence": "unknown",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "unknown",
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "the all‑in‑one HR platform for global teams"
+        },
+        "rejectedFields": [],
+        "tokens": 3528
+      }
+    }
+  },
+  {
+    "domain": "brex.com",
+    "data": {
+      "industry": "FinTech",
+      "industryEvidence": "Modern cards, banking, expenses, accounting, and more — in 120+ countries.",
+      "industryInferred": false,
+      "employeeSize": "unknown",
+      "employeeSizeEvidence": "Not found on fetched pages",
+      "techSignals": [],
+      "techSignalsEvidence": "unknown",
+      "hiringSignals": "unknown",
+      "hiringSignalsEvidence": "Not found (fetch returned 11049 chars)",
+      "hiringJobCount": 0,
+      "location": "unknown",
+      "locationEvidence": "Not found on fetched pages",
+      "businessModel": "SaaS",
+      "businessModelEvidence": "Our intelligent finance platform can help your company spend smarter and move faster.",
+      "confidence": "low",
+      "enrichmentSource": "live",
+      "textLength": 11049,
+      "pageTextLengths": {
+        "home": 5681,
+        "about": 2338,
+        "careers": 3000
+      },
+      "sources": {
+        "home": "https://brex.com",
+        "about": "https://brex.com/about",
+        "careers": "https://brex.com/careers"
+      },
+      "fetchedAt": "2026-10-09T06:26:38.835Z",
+      "enrichmentStatus": "success",
+      "_diagnostics": {
+        "rawLLM": {
+          "industry": "FinTech",
+          "industryEvidence": "Modern cards, banking, expenses, accounting, and more — in 120+ countries.",
+          "industryInferred": false,
+          "employeeSize": "unknown",
+          "employeeSizeEvidence": "Not found on fetched pages",
+          "techSignals": [],
+          "techSignalsEvidence": "unknown",
+          "hiringSignals": "unknown",
+          "hiringSignalsEvidence": "Not found on fetched pages",
+          "hiringJobCount": 0,
+          "location": "unknown",
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "SaaS",
+          "businessModelEvidence": "Our intelligent finance platform can help your company spend smarter and move faster."
+        },
+        "rejectedFields": [],
+        "tokens": 3589
+      }
+    }
+  }
+]
