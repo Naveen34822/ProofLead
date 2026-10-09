@@ -10,6 +10,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import puppeteer from 'puppeteer';
 import robotsParser from 'robots-parser';
+import { USER_AGENT } from './config/ua.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -80,7 +81,7 @@ const fetchPage = async (url, usePuppeteer = false, retryCount = 0, isWwwRetry =
       console.log(`[Puppeteer] Fetching ${url}...`);
       const browser = await puppeteer.launch({ headless: 'new' });
       const page = await browser.newPage();
-      await page.setUserAgent('ProofLeadBot/1.0 (+https://github.com/CapraeCapital/ProofLead)');
+      await page.setUserAgent(USER_AGENT);
       await page.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
       const html = await page.content();
       await browser.close();
@@ -90,7 +91,7 @@ const fetchPage = async (url, usePuppeteer = false, retryCount = 0, isWwwRetry =
     }
 
     const headers = {
-      'User-Agent': 'ProofLeadBot/1.0',
+      'User-Agent': USER_AGENT,
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
       'Accept-Language': 'en-US,en;q=0.9',
       'Accept-Encoding': 'gzip, deflate, br'
@@ -264,12 +265,12 @@ app.post('/api/enrich', liveEnrichLimiter, async (req, res) => {
   let robotsTxtContent = '';
   const robotsUrl = `${baseUrl}/robots.txt`;
   try {
-    const rRes = await axios.get(robotsUrl, { timeout: 3000 });
+    const rRes = await axios.get(robotsUrl, { headers: { 'User-Agent': USER_AGENT }, timeout: 3000 });
     robotsTxtContent = rRes.data;
   } catch (err) {}
   
   const robots = robotsParser(robotsUrl, robotsTxtContent);
-  const ua = 'ProofLeadBot/1.0 (+https://github.com/CapraeCapital/ProofLead)';
+  const ua = USER_AGENT;
 
   const checkAndFetch = async (url, charLimit) => {
     if (robotsTxtContent && !robots.isAllowed(url, ua)) {
