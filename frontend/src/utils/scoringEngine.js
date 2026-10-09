@@ -106,9 +106,10 @@ function techScore(companyTech, targetTech) {
   if (!targetTech || targetTech.length === 0) return 70;
   if (!companyTech || companyTech.length === 0) return 30;
   
-  const matches = companyTech.filter(t => 
-    targetTech.some(tt => t.toLowerCase().includes(tt.toLowerCase()) || tt.toLowerCase().includes(t.toLowerCase()))
-  );
+  const matches = companyTech.filter(t => {
+    const techStr = typeof t === 'object' ? t.tech : t;
+    return targetTech.some(tt => techStr.toLowerCase().includes(tt.toLowerCase()) || tt.toLowerCase().includes(techStr.toLowerCase()));
+  });
   if (matches.length === 0) return 20;
   return Math.min(40 + (matches.length / Math.max(targetTech.length, 1)) * 60, 100);
 }
@@ -137,10 +138,22 @@ export function scoreCompany(company, icp) {
   let rawScore = 0;
   const TOTAL_SIGNALS = 5; // Industry, Size, Location, Hiring, Tech
 
-  if (company.industry && company.industry !== 'unknown') {
+  const hasIndustry = company.industry && company.industry !== 'unknown';
+  const hasBusinessModel = company.businessModel && company.businessModel !== 'unknown';
+
+  if (hasIndustry || hasBusinessModel) {
     validSignals++;
     totalWeights += 0.30;
-    factors.industry = { score: industryMatchScore(company.industry, icp.industries).score, weight: 0.30, label: 'Industry Match' };
+    
+    let indScore = 0;
+    if (hasIndustry) {
+      indScore = industryMatchScore(company.industry, icp.industries).score;
+    }
+    if (hasBusinessModel && icp.industries && icp.industries.some(i => i.toLowerCase() === company.businessModel.toLowerCase())) {
+      indScore = 100;
+    }
+    
+    factors.industry = { score: indScore, weight: 0.30, label: 'Industry/Model Match' };
   } else {
     factors.industry = { score: 0, weight: 0, label: 'Industry Match (Unknown)' };
   }
@@ -277,8 +290,9 @@ function generateReason(company, factors, score, icp) {
   }
   
   if (factors.tech.weight > 0) {
-    if (factors.tech.score >= 70) parts.push(`Tech matches (${(company.techSignals || []).join(', ')})`);
-    else parts.push(`Tech partial (${(company.techSignals || []).join(', ')})`);
+    const techList = (company.techSignals || []).map(t => typeof t === 'object' ? t.tech : t).join(', ');
+    if (factors.tech.score >= 70) parts.push(`Tech matches (${techList})`);
+    else parts.push(`Tech partial (${techList})`);
   } else {
     parts.push(`Tech unknown`);
   }
@@ -309,9 +323,9 @@ function generateOutreach(company, factors, score) {
   }
   
   if (score >= 75) {
-    return `${company.name} is a high-priority target. ${angle}`;
+    return `${company.name || company.csvName || company.domain || 'This company'} is a high-priority target. ${angle}`;
   }
-  return `${company.name} is a moderate fit. Nurture this lead: ${angle}`;
+  return `${company.name || company.csvName || company.domain || 'This company'} is a moderate fit. Nurture this lead: ${angle}`;
 }
 
 export function scoreAndRankLeads(companies, icp) {

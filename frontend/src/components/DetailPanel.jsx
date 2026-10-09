@@ -252,7 +252,7 @@ export default function DetailPanel({ lead, onClose, onStatusChange }) {
             <div className="detail-field" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '0.25rem' }}>
                 <span className="detail-field-label">Hiring Signals</span>
-                <span className="detail-field-value" style={{ color: lead.hiringSignals === true ? 'var(--success)' : 'inherit' }}>
+                <span className="detail-field-value" style={{ color: lead.hiringJobCount > 0 ? 'var(--success)' : 'inherit' }}>
                   {lead.enrichmentStatus === 'blocked' || lead.enrichmentStatus === 'failed' ? '—' : formatHiring(lead.hiringSignals, lead.hiringJobCount)}
                 </span>
               </div>
@@ -280,9 +280,11 @@ export default function DetailPanel({ lead, onClose, onStatusChange }) {
             <div className="detail-section">
               <h3 className="detail-section-title">Tech Stack</h3>
               <div className="form-chips">
-                {lead.techSignals.map(t => (
-                  <span key={t} className="chip">{t}</span>
-                ))}
+                {lead.techSignals.map((t, idx) => {
+                  const techName = typeof t === 'object' ? t.tech : t;
+                  const countLabel = typeof t === 'object' && t.source === 'ats' && t.count > 0 ? ` (${t.count}/${t.totalRoles})` : '';
+                  return <span key={techName + idx} className="chip">{techName}{countLabel}</span>;
+                })}
               </div>
               {lead.techSignalsEvidence && (
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'var(--bg-tertiary)', padding: '0.5rem', borderRadius: '4px', width: '100%', fontStyle: 'italic', marginTop: '0.5rem' }}>

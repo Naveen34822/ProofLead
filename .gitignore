@@ -33,3 +33,4 @@ dist-ssr
 !**/.env.example
 backend/cache/
 cache/
+backend/data/*.db*

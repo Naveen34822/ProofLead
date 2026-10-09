@@ -1,5 +1,3 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import axios from 'axios';
@@ -14,6 +12,9 @@ import { USER_AGENT } from './config/ua.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+import * as dotenv from 'dotenv';
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 import rateLimit from 'express-rate-limit';
 
@@ -34,9 +35,52 @@ const liveEnrichLimiter = rateLimit({
   }
 });
 
-const cacheDir = path.join(__dirname, 'cache');
-if (!fs.existsSync(cacheDir)) {
-  fs.mkdirSync(cacheDir, { recursive: true });
+import Database from 'better-sqlite3';
+
+const dataDir = path.join(__dirname, 'data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+const db = new Database(path.join(dataDir, 'leads.db'));
+db.pragma('journal_mode = WAL');
+db.exec(`
+  CREATE TABLE IF NOT EXISTS leads (
+    domain TEXT PRIMARY KEY,
+    name TEXT,
+    data JSON,
+    confidence TEXT,
+    score INTEGER,
+    status TEXT,
+    source TEXT,
+    failed_reason TEXT,
+    fetched_at TEXT,
+    using_cached_from TEXT
+  )
+`);
+
+const seedDir = path.join(__dirname, 'seed');
+const seedFile = path.join(seedDir, 'leads.json');
+const rowCount = db.prepare('SELECT COUNT(*) as count FROM leads').get().count;
+if (rowCount === 0 && fs.existsSync(seedFile)) {
+  console.log('Seeding DB from leads.json...');
+  const seedData = JSON.parse(fs.readFileSync(seedFile, 'utf-8'));
+  const insert = db.prepare(`
+    INSERT INTO leads (domain, data, confidence, status, source, fetched_at)
+    VALUES (@domain, @data, @confidence, @status, @source, @fetched_at)
+  `);
+  db.transaction(() => {
+    for (const lead of seedData) {
+      insert.run({
+        domain: lead.domain,
+        data: JSON.stringify(lead.data),
+        confidence: lead.data.confidence || null,
+        status: lead.data.enrichmentStatus || 'success',
+        source: lead.data.enrichmentSource || 'live',
+        fetched_at: lead.data.fetchedAt || new Date().toISOString()
+      });
+    }
+  })();
 }
 
 const TECH_WHITELIST = new Set([
@@ -66,7 +110,7 @@ const extractText = (html, maxLimit = 15000) => {
   
   let text = $('body').text().replace(/\s+/g, ' ').trim();
   
-  if (text.length < 500) {
+  if (text.length < 1500) {
     const title = $('title').text();
     const desc = $('meta[name="description"]').attr('content') || '';
     const ogDesc = $('meta[property="og:description"]').attr('content') || '';
@@ -102,14 +146,17 @@ const fetchPage = async (url, usePuppeteer = false, retryCount = 0, isWwwRetry =
     
     console.log(`Fetched ${url} - Status: ${res.status}, Length: ${text.length}`);
     
-    if (text.length < 500) {
-      console.log(`[Fallback] Text < 500 chars for ${url}, trying Puppeteer...`);
+    if (text.length < 1500) {
+      console.log(`[Fallback] Text < 1500 chars for ${url}, trying Puppeteer...`);
       return await fetchPage(url, true, retryCount, isWwwRetry, charLimit);
     }
     
     return { text, html: res.data };
   } catch (e) {
-    if (e.response && (e.response.status === 429 || e.response.status === 403)) {
+    if (e.response && e.response.status === 403) {
+      return { text: '', html: '', blocked: true, blockedCode: 403, blockedReason: 'HTTP 403' };
+    }
+    if (e.response && e.response.status === 429) {
       if (retryCount < 2) {
         let waitMs = 2000 * (retryCount + 1);
         if (e.response.headers['retry-after']) {
@@ -118,12 +165,12 @@ const fetchPage = async (url, usePuppeteer = false, retryCount = 0, isWwwRetry =
             waitMs = retryAfter < 10 ? retryAfter * 1000 : waitMs; // if it's seconds and reasonable
           }
         }
-        console.warn(`Blocked on ${url} (${e.response.status}). Retrying in ${waitMs}ms...`);
+        console.warn(`Blocked on ${url} (429). Retrying in ${waitMs}ms...`);
         await new Promise(r => setTimeout(r, waitMs));
-        return await fetchPage(url, usePuppeteer, retryCount + 1, isWwwRetry);
+        return await fetchPage(url, false, retryCount + 1, isWwwRetry, charLimit); // never puppeteer after 429
       } else {
-        console.warn(`Failed to bypass bot protection for ${url} (${e.response.status}) after retries.`);
-        return { text: '', html: '', blocked: true, blockedCode: e.response.status, blockedReason: `HTTP ${e.response.status}` };
+        console.warn(`Failed to bypass bot protection for ${url} (429) after retries.`);
+        return { text: '', html: '', blocked: true, blockedCode: 429, blockedReason: `HTTP 429` };
       }
     }
 
@@ -180,21 +227,62 @@ const checkAtsJobs = async (careersHtml, domain) => {
       console.log(`[${domain}] Ashby response status: ${res.status}, count: ${count}`);
     }
     
+    let techCounts = {};
+    let engineeringRolesCount = 0;
+    
+    for (const job of jobsList) {
+      const title = (job.title || job.text || '').toLowerCase();
+      let department = '';
+      if (job.categories && job.categories.team) department = job.categories.team;
+      else if (job.departments && job.departments[0] && job.departments[0].name) department = job.departments[0].name;
+      else if (job.department) department = job.department;
+      
+      department = department.toLowerCase();
+      
+      const isEngRole = title.includes('engineer') || title.includes('developer') || title.includes('data') || title.includes('product') ||
+                        department.includes('engineer') || department.includes('data') || department.includes('product');
+                        
+      if (isEngRole) {
+        engineeringRolesCount++;
+        const textRaw = JSON.stringify(job);
+        const textLower = textRaw.toLowerCase();
+        
+        for (const tech of TECH_WHITELIST) {
+          let found = false;
+          if (tech === 'go') {
+            if (/\bgolang\b/i.test(textRaw) || /\bGo\b/.test(textRaw)) {
+              found = true;
+            }
+          } else {
+            const escaped = tech.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+            const regex = new RegExp(`(?:^|[^a-z0-9])${escaped}(?:[^a-z0-9]|$)`, 'i');
+            if (regex.test(textLower)) found = true;
+          }
+          if (found) {
+            const techName = tech === 'node' ? 'node.js' : tech;
+            techCounts[techName] = (techCounts[techName] || 0) + 1;
+          }
+        }
+      }
+    }
+    
     let atsTechFound = [];
     let atsTechEvidence = '';
     
-    for (const job of jobsList) {
-      const title = job.title || job.text || '';
-      const textToSearch = (JSON.stringify(job)).toLowerCase();
-      for (const tech of TECH_WHITELIST) {
-        if (!atsTechFound.includes(tech)) {
-          const escaped = tech.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-          const regex = new RegExp(`(?:^|[^a-z0-9])${escaped}(?:[^a-z0-9]|$)`, 'i');
-          if (regex.test(textToSearch)) {
-            atsTechFound.push(tech);
-            if (!atsTechEvidence) atsTechEvidence = `Found in ATS job description for ${title}`;
-          }
-        }
+    if (engineeringRolesCount > 0) {
+      const validTechs = Object.entries(techCounts)
+        .filter(([tech, tCount]) => tCount >= 3 || (tCount / engineeringRolesCount) >= 0.1)
+        .sort((a, b) => b[1] - a[1]);
+        
+      if (validTechs.length > 0) {
+        atsTechFound = validTechs.map(t => ({
+          tech: t[0],
+          source: 'ats',
+          count: t[1],
+          totalRoles: engineeringRolesCount
+        }));
+        const topTech = validTechs[0];
+        atsTechEvidence = `Found in ATS: ${topTech[0]} in ${topTech[1]} of ${engineeringRolesCount} engineering/product roles`;
       }
     }
     
@@ -225,11 +313,11 @@ app.post('/api/enrich', liveEnrichLimiter, async (req, res) => {
   const { domain, website, forceRefresh } = req.body;
   if (!domain) return res.status(400).json({ error: 'Domain is required' });
 
-  const cachePath = path.join(cacheDir, `${domain}.json`);
+  const row = db.prepare('SELECT * FROM leads WHERE domain = ?').get(domain);
   let existingCache = null;
-  if (fs.existsSync(cachePath)) {
+  if (row && row.data) {
     try {
-      const cachedData = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+      const cachedData = JSON.parse(row.data);
       if (cachedData.textLength < 500 || cachedData.enrichmentStatus === 'failed') {
         console.log(`[${domain}] Ignoring stale cache (text < 500 or failed).`);
       } else {
@@ -237,12 +325,12 @@ app.post('/api/enrich', liveEnrichLimiter, async (req, res) => {
           existingCache = cachedData;
           console.log(`Bypassing cache for ${domain} (forceRefresh)...`);
         } else {
-          console.log('Serving from cache:', domain);
-          return res.json(cachedData);
+          console.log('Serving from DB:', domain);
+          return res.json({ ...cachedData, enrichmentSource: 'db' });
         }
       }
     } catch (err) {
-      console.warn(`[${domain}] Error reading cache file:`, err.message);
+      console.warn(`[${domain}] Error reading DB data:`, err.message);
     }
   }
 
@@ -317,6 +405,11 @@ app.post('/api/enrich', liveEnrichLimiter, async (req, res) => {
   };
 
   const textLength = combinedText.length;
+  const pageTextLengths = {
+    home: homeReq.text.length,
+    about: aboutReq.text.length,
+    careers: careersReq.text.length
+  };
 
   if (textLength < 500 && !atsJobs) {
      console.warn(`[${domain}] Text length < 500 (${textLength} chars) and no ATS. Failing fetch.`);
@@ -331,7 +424,7 @@ app.post('/api/enrich', liveEnrichLimiter, async (req, res) => {
 
   const prompt = `Analyze the following website text for ${domain} and extract these data points in valid JSON format:
 1. industry: The primary industry or vertical based on what the company does. MUST be one of: ${ALLOWED_INDUSTRIES.join(', ')}. Return "Other" or "unknown" if unclear.
-2. industryEvidence: A verbatim quote that describes the product or business, used as evidence for your chosen industry.
+2. industryEvidence: A verbatim quote that describes what the company's product does.
 3. industryInferred: boolean. Mark this true if you inferred the industry from the product description.
 4. employeeSize: A string hint of the employee size (e.g., "50-200", "1000+"). Often found on about or careers pages. Return "unknown" if unclear.
 5. employeeSizeEvidence: Snippet proving the size.
@@ -340,8 +433,10 @@ app.post('/api/enrich', liveEnrichLimiter, async (req, res) => {
 ${atsJobs ? `8. hiringSignals: ${atsJobs.hiringSignals}\n9. hiringSignalsEvidence: "${atsJobs.hiringSignalsEvidence}"\n10. hiringJobCount: ${atsJobs.count || 0}` : `8. hiringSignals: "unknown"\n9. hiringSignalsEvidence: "Not found on fetched pages"\n10. hiringJobCount: 0`}
 11. location: The company's headquarters or primary office location (city, country). Return "unknown" if not stated.
 12. locationEvidence: Snippet proving the location.
+13. businessModel: The core business model. Default to "unknown". Return "SaaS", "Services", "Marketplace", or "Other" ONLY when the quote explicitly shows software delivered as a product or subscription (e.g. pricing plans, sign-up, "platform", "software"); a tagline alone is not enough.
+14. businessModelEvidence: A verbatim quote that describes the product, proving the business model selection.
 
-Return ONLY a valid JSON object with keys: industry, industryEvidence, industryInferred, employeeSize, employeeSizeEvidence, techSignals, techSignalsEvidence, hiringSignals, hiringSignalsEvidence, hiringJobCount, location, locationEvidence.
+Return ONLY a valid JSON object with keys: industry, industryEvidence, industryInferred, employeeSize, employeeSizeEvidence, techSignals, techSignalsEvidence, hiringSignals, hiringSignalsEvidence, hiringJobCount, location, locationEvidence, businessModel, businessModelEvidence.
 CRITICAL RULE: Use ONLY the provided page text. If a field is not stated in the text, return "unknown" for the value and "Not found on fetched pages" for the evidence field. Every non-unknown field must include an exact quote from the text. Do not invent any values.
 
 Text to analyze:
@@ -349,6 +444,9 @@ ${combinedText.slice(0, 30000)}`;
 
   try {
     console.log('Calling LLM for:', domain);
+    if (process.env.DISABLE_LLM === '1') {
+      throw new Error('LLM call disabled as per instructions');
+    }
     const primaryModel = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
     const fallbackModel = 'openai/gpt-oss-20b';
     
@@ -404,20 +502,48 @@ ${combinedText.slice(0, 30000)}`;
     
     // Filter tech stack: reject blacklisted, require whitelist match
     if (Array.isArray(data.techSignals)) {
-      data.techSignals = data.techSignals.filter(t => {
-        const lower = t.toLowerCase().trim();
-        if (TECH_BLACKLIST.has(lower)) return false;
-        return TECH_WHITELIST.has(lower);
-      });
+      const llmTechs = new Map();
+      for (const t of data.techSignals) {
+        if (typeof t !== 'string') continue;
+        let lower = t.toLowerCase().trim();
+        if (lower === 'node') lower = 'node.js';
+        if (TECH_BLACKLIST.has(lower)) continue;
+        if (TECH_WHITELIST.has(lower)) {
+           if (!llmTechs.has(lower)) {
+              llmTechs.set(lower, { tech: lower, source: 'website' });
+           }
+        }
+      }
+      data.techSignals = Array.from(llmTechs.values());
+      
       if (data.techSignals.length === 0) {
         data.techSignalsEvidence = 'unknown';
       }
+    } else {
+      data.techSignals = [];
     }
     
     // Inject ATS tech
     if (atsJobs && atsJobs.atsTechFound && atsJobs.atsTechFound.length > 0) {
-      const existingTech = Array.isArray(data.techSignals) ? data.techSignals : [];
-      data.techSignals = Array.from(new Set([...existingTech, ...atsJobs.atsTechFound]));
+      const combinedTech = new Map();
+      // ATS first (has valid counts)
+      for (const t of atsJobs.atsTechFound) {
+        combinedTech.set(t.tech, t);
+      }
+      // Add LLM if not already in ATS
+      for (const t of data.techSignals) {
+        if (!combinedTech.has(t.tech)) {
+           combinedTech.set(t.tech, t);
+        }
+      }
+      // Sort by source (ATS first) then count descending
+      data.techSignals = Array.from(combinedTech.values()).sort((a, b) => {
+        if (a.source === 'ats' && b.source !== 'ats') return -1;
+        if (a.source !== 'ats' && b.source === 'ats') return 1;
+        if (a.source === 'ats' && b.source === 'ats') return (b.count || 0) - (a.count || 0);
+        return 0;
+      });
+      
       if (!data.techSignalsEvidence || data.techSignalsEvidence === 'unknown') {
         data.techSignalsEvidence = atsJobs.atsTechEvidence;
       } else {
@@ -426,7 +552,7 @@ ${combinedText.slice(0, 30000)}`;
     }
     
     if (Array.isArray(data.techSignals)) {
-      console.log(`[${domain}] Tech after whitelist filter: [${data.techSignals.join(', ')}]`);
+      console.log(`[${domain}] Tech after whitelist filter: [${data.techSignals.map(t => t.tech).join(', ')}]`);
     }
     
     // Verification step
@@ -443,6 +569,14 @@ ${combinedText.slice(0, 30000)}`;
     const rejectedFields = [];
     
     console.log(`[${domain}] RAW LLM DATA: ${JSON.stringify(data)}`);
+    
+    if (!verifyEvidence(data.businessModelEvidence, combinedText)) {
+      const reason = `Quote not found in text: "${data.businessModelEvidence}"`;
+      console.warn(`[${domain}] REJECTED businessModel "${data.businessModel}". ${reason}`);
+      rejectedFields.push({ field: 'businessModel', value: data.businessModel, reason });
+      data.businessModel = 'unknown';
+      data.businessModelEvidence = 'unknown';
+    }
 
     if (!verifyEvidence(data.industryEvidence, combinedText)) {
       const reason = `Quote not found in text: "${data.industryEvidence}"`;
@@ -462,7 +596,7 @@ ${combinedText.slice(0, 30000)}`;
     
     if (!verifyEvidence(data.techSignalsEvidence, combinedText)) {
       const reason = `Quote not found in text: "${data.techSignalsEvidence}"`;
-      console.warn(`[${domain}] REJECTED techSignals "[${data.techSignals.join(',')}]". ${reason}`);
+      console.warn(`[${domain}] REJECTED techSignals "[${data.techSignals.map(t=>t.tech).join(',')}]". ${reason}`);
       rejectedFields.push({ field: 'techSignals', value: data.techSignals, reason });
       data.techSignals = [];
       data.techSignalsEvidence = 'unknown';
@@ -471,11 +605,11 @@ ${combinedText.slice(0, 30000)}`;
     if (atsJobs) {
       data.hiringSignals = atsJobs.hiringSignals;
       data.hiringSignalsEvidence = atsJobs.hiringSignalsEvidence;
-      data.hiringJobCount = atsJobs.count || 0;
+      data.hiringJobCount = atsJobs.count; // atsJobs.count is already an integer
     } else {
       data.hiringSignals = 'unknown';
       data.hiringSignalsEvidence = `Not found (fetch returned ${textLength} chars)`;
-      data.hiringJobCount = 0;
+      data.hiringJobCount = null;
     }
 
     // Validate location evidence
@@ -507,15 +641,33 @@ ${combinedText.slice(0, 30000)}`;
     }
     data.enrichmentSource = 'live';
     data.textLength = textLength;
+    data.pageTextLengths = pageTextLengths;
     data.sources = sources;
     data.fetchedAt = new Date().toISOString();
     if (data.enrichmentStatus !== 'blocked' && data.enrichmentStatus !== 'failed') {
       data.enrichmentStatus = 'success';
     }
-    data._diagnostics = { rawLLM, rejectedFields };
+    const tokens = response?.usage?.total_tokens || null;
+    data._diagnostics = { rawLLM, rejectedFields, tokens };
     
     if (data.enrichmentStatus === 'success' && data.textLength >= 500) {
-      fs.writeFileSync(cachePath, JSON.stringify(data, null, 2));
+      db.prepare(`
+        INSERT INTO leads (domain, data, confidence, status, source, fetched_at)
+        VALUES (@domain, @data, @confidence, @status, @source, @fetched_at)
+        ON CONFLICT(domain) DO UPDATE SET
+          data = excluded.data,
+          confidence = excluded.confidence,
+          status = excluded.status,
+          source = excluded.source,
+          fetched_at = excluded.fetched_at
+      `).run({
+        domain,
+        data: JSON.stringify(data),
+        confidence: data.confidence || null,
+        status: data.enrichmentStatus,
+        source: data.enrichmentSource,
+        fetched_at: data.fetchedAt
+      });
     } else {
       console.warn(`[${domain}] Not caching because enrichmentStatus is ${data.enrichmentStatus} or textLength < 500.`);
     }

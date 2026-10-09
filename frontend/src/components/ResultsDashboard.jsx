@@ -322,13 +322,13 @@ export default function ResultsDashboard({ leads, stats, icp, onExport, onSelect
                   {lead.enrichmentStatus === 'blocked' || lead.enrichmentStatus === 'failed' ? (
                     <span style={{ color: 'var(--text-muted)' }}>—</span>
                   ) : (
-                    <span style={{ color: lead.hiringSignals === true ? 'var(--success)' : 'var(--text-muted)' }}>
-                      {lead.hiringSignals === true && '✓ '}{formatHiring(lead.hiringSignals, lead.hiringJobCount)}
+                    <span style={{ color: lead.hiringJobCount > 0 ? 'var(--success)' : 'var(--text-muted)' }}>
+                      {lead.hiringJobCount > 0 && '✓ '}{formatHiring(lead.hiringSignals, lead.hiringJobCount)}
                     </span>
                   )}
                 </td>
-                <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={(lead.techSignals || []).join(', ')}>
-                  {(lead.techSignals || []).join(', ') || '—'}
+                <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={(lead.techSignals || []).map(t => typeof t === 'object' ? t.tech : t).join(', ')}>
+                  {(lead.techSignals || []).map(t => typeof t === 'object' ? t.tech : t).slice(0, 5).join(', ') || '—'}
                 </td>
                 <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
                   {Object.values(lead.factors || {}).filter(f => f.weight > 0).length}/4
