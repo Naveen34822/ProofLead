@@ -43,6 +43,7 @@ if (!fs.existsSync(dataDir)) {
 
 const dbPath = process.env.DB_PATH || path.join(dataDir, 'leads.db');
 console.log('About to initialize database at:', dbPath);
+fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 const db = new Database(dbPath);
 console.log('Database initialized successfully.');
 db.pragma('journal_mode = WAL');
