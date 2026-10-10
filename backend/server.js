@@ -145,7 +145,7 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || 'fake_key' });
 
 const extractText = (html, maxLimit = 15000) => {
   const $ = cheerio.load(html);
-  $('script, style, noscript, iframe, img, svg, header, footer, nav').remove();
+  $('script, style, noscript, iframe, img, svg, template, header, footer, nav, [style*="display:none"], [style*="display: none"]').remove();
   
   $('blockquote').remove();
   $('[class*="testimonial"], [class*="review"], [class*="quote"], [class*="customer-story"]').remove();
@@ -698,9 +698,19 @@ ${combinedText.slice(0, 30000)}`;
         const reason = `Quote not found in first-party text (Home Meta/H1 or first 1500 chars of About): "${data.industryEvidence}"`;
         console.warn(`[${domain}] REJECTED industry "${data.industry}". ${reason}`);
         rejectedFields.push({ field: 'industry', value: data.industry, reason });
-        data.industry = csvIndustry || 'unknown';
-        data.industryEvidence = csvIndustry ? null : 'unknown';
-        data.industryInferred = true;
+        
+        // Deterministic Fallback
+        const title = cheerio.load(combinedText)('title').text() || cheerio.load(metaText)('title').text();
+        const metaDesc = cheerio.load(combinedText)('meta[name="description"]').attr('content') || cheerio.load(metaText)('meta[name="description"]').attr('content');
+        
+        if (title || metaDesc) {
+            data.industry = csvIndustry || data.industry;
+            data.industryEvidence = `Page title/meta: ${title || metaDesc}`;
+        } else {
+            data.industry = csvIndustry || 'unknown';
+            data.industryEvidence = csvIndustry ? null : 'unknown';
+            data.industryInferred = true;
+        }
       }
     }
     
