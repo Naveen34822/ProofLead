@@ -401,7 +401,7 @@ export function leadsToCSV(leads) {
     `"${(lead.locationEvidence || '').replace(/"/g, '""')}"`,
     lead.hiringSignals ? 'Yes' : 'No',
     `"${(lead.hiringSignalsEvidence || '').replace(/"/g, '""')}"`,
-    `"${(lead.techSignals || []).join('; ').replace(/"/g, '""')}"`,
+    `"${(lead.techSignals || []).map(t => typeof t === 'object' ? `${t.tech} (${t.count}/${t.totalRoles})` : t).join('; ').replace(/"/g, '""')}"`,
     `"${(lead.reason || '').replace(/"/g, '""')}"`,
     `"${(lead.outreach || '').replace(/"/g, '""')}"`,
     lead.status || 'new'
