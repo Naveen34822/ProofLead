@@ -307,7 +307,7 @@ const checkAtsJobs = async (careersHtml, domain) => {
         const html = (job.descriptionHtml || job.text || "");
         let cleanHtml = html.replace(/<br\s*\/?>/gi, "\n").replace(/<\/?p>/gi, "\n");
         cleanHtml = cleanHtml.replace(/<[^>]+>/g, " ");
-        let textRaw = cleanHtml;
+        let textRaw = cleanHtml.replace(/\s+/g, " ");
         
         if (boilerplateParas.length > 0) {
           const jobParas = cleanHtml.split(/\n/).map(p => p.trim().replace(/\s+/g, " "));
