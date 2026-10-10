@@ -1,4 +1,3 @@
-
 import * as cheerio from "cheerio";
 import axios from "axios";
 const TECH_ALIASES = {
@@ -78,7 +77,22 @@ const checkAtsJobs = async (careersHtml, domain) => {
       console.log(`[${domain}] Ashby response status: ${res.status}, count: ${count}`);
     }
     
-        let techCounts = {};
+        // Extract boilerplate paragraphs that appear in >50% of roles
+    const paragraphCounts = {};
+    for (const job of jobsList) {
+      const html = (job.descriptionHtml || job.text || "");
+      const cleanHtml = html.replace(/<[^>]+>/g, " ");
+      const paras = cleanHtml.split("
+").map(p => p.trim().replace(/s+/g, " ")).filter(p => p.length > 50);
+      for (const p of paras) {
+        paragraphCounts[p] = (paragraphCounts[p] || 0) + 1;
+      }
+    }
+    const boilerplateParas = Object.entries(paragraphCounts)
+      .filter(([p, count]) => count > jobsList.length * 0.5)
+      .map(([p]) => p);
+
+    let techCounts = {};
     let engineeringRolesCount = 0;
     
     for (const job of jobsList) {
@@ -95,7 +109,21 @@ const checkAtsJobs = async (careersHtml, domain) => {
                         
       if (isEngRole) {
         engineeringRolesCount++;
-        const textRaw = JSON.stringify(job);
+        
+        let textRaw = JSON.stringify(job);
+        
+        // Strip boilerplate
+        if (boilerplateParas.length > 0) {
+           const jobCleanHtml = (job.descriptionHtml || job.text || "").replace(/<[^>]+>/g, " ");
+           const jobParas = jobCleanHtml.split("
+").map(p => p.trim().replace(/s+/g, " "));
+           for (const p of jobParas) {
+              if (boilerplateParas.includes(p)) {
+                 textRaw = textRaw.replace(p, " ");
+              }
+           }
+        }
+        
         const textLower = textRaw.toLowerCase();
         const roleTechs = new Set();
         
@@ -184,19 +212,15 @@ const checkAtsJobs = async (careersHtml, domain) => {
   return { atsDetected: atsData ? atsData.type : null, hiringSignals: 'unknown', count: null };
 };
 async function run() {
-  const s = await checkAtsJobs(
-    "<a href=\"https://jobs.ashbyhq.com/supabase\">jobs</a>", "supabase.com"
-  );
+  const s = await checkAtsJobs("<a href=\"https://jobs.ashbyhq.com/supabase\">jobs</a>", "supabase.com");
   if (s) {
     console.log("Supabase:");
-    console.log(s.atsTechFound.map(t => `${t.tech} (${t.count}/${t.totalRoles} roles)`).join(", "));
+    console.log(s.atsTechFound.map(t => t.tech + " (" + t.count + "/" + t.totalRoles + " roles)").join(", "));
   }
-  const n = await checkAtsJobs(
-    "<a href=\"https://jobs.ashbyhq.com/notion\">jobs</a>", "notion.so"
-  );
+  const n = await checkAtsJobs("<a href=\"https://jobs.ashbyhq.com/notion\">jobs</a>", "notion.so");
   if (n) {
     console.log("Notion:");
-    console.log(n.atsTechFound.map(t => `${t.tech} (${t.count}/${t.totalRoles} roles)`).join(", "));
+    console.log(n.atsTechFound.map(t => t.tech + " (" + t.count + "/" + t.totalRoles + " roles)").join(", "));
   }
 }
 run();

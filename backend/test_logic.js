@@ -6,6 +6,7 @@ import Groq from 'groq-sdk';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import puppeteer from 'puppeteer';
 import robotsParser from 'robots-parser';
 import { USER_AGENT } from './config/ua.js';
 
@@ -42,9 +43,7 @@ if (!fs.existsSync(dataDir)) {
 }
 
 const dbPath = process.env.DB_PATH || path.join(dataDir, 'leads.db');
-console.log('About to initialize database at:', dbPath);
 const db = new Database(dbPath);
-console.log('Database initialized successfully.');
 db.pragma('journal_mode = WAL');
 db.exec(`
   CREATE TABLE IF NOT EXISTS leads (
@@ -167,7 +166,6 @@ const fetchPage = async (url, usePuppeteer = false, retryCount = 0, isWwwRetry =
   try {
     if (usePuppeteer && process.env.PUPPETEER_ENABLED !== 'false') {
       console.log(`[Puppeteer] Fetching ${url}...`);
-      const { default: puppeteer } = await import('puppeteer');
       const browser = await puppeteer.launch({ headless: 'new' });
       const page = await browser.newPage();
       await page.setUserAgent(USER_AGENT);
@@ -273,12 +271,12 @@ const checkAtsJobs = async (careersHtml, domain) => {
     }
     
     
+    // Extract boilerplate paragraphs that appear in >50% of roles
     const paragraphCounts = {};
     for (const job of jobsList) {
       const html = (job.descriptionHtml || job.text || "");
-      let cleanHtml = html.replace(/<br\s*\/?>/gi, "\n").replace(/<\/?p>/gi, "\n");
-      cleanHtml = cleanHtml.replace(/<[^>]+>/g, " ");
-      const paras = cleanHtml.split(/\n/).map(p => p.trim().replace(/\s+/g, " ")).filter(p => p.length > 50);
+      const cleanHtml = html.replace(/<[^>]+>/g, " ");
+      const paras = cleanHtml.split(/\r?\n/).map(p => p.trim().replace(/\s+/g, " ")).filter(p => p.length > 50);
       for (const p of paras) {
         paragraphCounts[p] = (paragraphCounts[p] || 0) + 1;
       }
@@ -305,27 +303,8 @@ const checkAtsJobs = async (careersHtml, domain) => {
                         
       if (isEngRole) {
         engineeringRolesCount++;
-        
-        const html = (job.descriptionHtml || job.text || "");
-        let cleanHtml = html.replace(/<br\s*\/?>/gi, "\n").replace(/<\/?p>/gi, "\n");
-        cleanHtml = cleanHtml.replace(/<[^>]+>/g, " ");
-        let textRaw = cleanHtml.replace(/\s+/g, " ");
-        
-        if (boilerplateParas.length > 0) {
-          const jobParas = cleanHtml.split(/\n/).map(p => p.trim().replace(/\s+/g, " "));
-          for (const p of jobParas) {
-            if (boilerplateParas.includes(p)) {
-               const pLower = p.toLowerCase();
-               const isCompanyIntro = pLower.includes("about") || pLower.includes("who we are") || pLower.includes("note on ai") || pLower.includes("notinos") || pLower.includes("equal opportunity") || pLower.includes("once a year") || pLower.includes("our goal") || pLower.includes("we care about");
-               if (isCompanyIntro) {
-                   textRaw = textRaw.replace(p, " ");
-               }
-            }
-          }
-        }
-        textRaw = textRaw.replace(/go-to-market/gi, " ");
+        const textRaw = JSON.stringify(job);
         const textLower = textRaw.toLowerCase();
-
         const roleTechs = new Set();
         
         for (const tech of TECH_WHITELIST) {
@@ -335,11 +314,11 @@ const checkAtsJobs = async (careersHtml, domain) => {
             const regex = new RegExp("(?:^|[^a-zA-Z0-9])" + capTech + "(?:[^a-zA-Z0-9]|$)");
             if (regex.test(textRaw)) found = true;
           } else if (tech === "c++" || tech === "c#" || tech === ".net") {
-            const escaped = tech.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+            const escaped = tech.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
             const regex = new RegExp("(?:^|\\s)" + escaped + "(?:\\s|$)", "i");
             if (regex.test(textLower)) found = true;
           } else {
-            const escaped = tech.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+            const escaped = tech.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
             const regex = new RegExp("\\b" + escaped + "\\b", "i");
             if (regex.test(textLower)) {
                if (tech === "java" && /\bjavascript\b/i.test(textLower) && !/\bjava\b/i.test(textLower)) {
@@ -653,7 +632,7 @@ ${combinedText.slice(0, 30000)}`;
     const csvNameLabel = (data.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     if (atsJobs && atsJobs.atsTechFound && atsJobs.atsTechFound.length > 0) {
       data.techSignals = atsJobs.atsTechFound
-        .filter(t => t.tech !== domainLabel && (!csvNameLabel || t.tech !== csvNameLabel) && t.tech !== domain.split(".")[0])
+        .filter(t => t.tech !== domainLabel && (!csvNameLabel || t.tech !== csvNameLabel) && t.tech !== companyName)
         .sort((a, b) => (b.count || 0) - (a.count || 0));
 
       data.techSignalsEvidence = atsJobs.atsTechEvidence;
@@ -817,7 +796,21 @@ app.get(/^.*$/, (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
-console.log('About to call app.listen on port:', PORT);
-app.listen(PORT, () => {
+// app.listen(PORT, () => {
   console.log(`Enrichment server running on http://localhost:${PORT}`);
 });
+
+async function run() {
+  const s = await checkAtsJobs("<a href=\"https://jobs.ashbyhq.com/supabase\">jobs</a>", "supabase.com");
+  if (s) {
+    console.log("Supabase:");
+    console.log(s.atsTechFound.map(t => t.tech + " (" + t.count + "/" + t.totalRoles + " roles)").join(", "));
+  }
+  const n = await checkAtsJobs("<a href=\"https://jobs.ashbyhq.com/notion\">jobs</a>", "notion.so");
+  if (n) {
+    console.log("Notion:");
+    console.log(n.atsTechFound.map(t => t.tech + " (" + t.count + "/" + t.totalRoles + " roles)").join(", "));
+  }
+  process.exit(0);
+}
+setTimeout(run, 1000);
