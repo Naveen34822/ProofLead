@@ -400,7 +400,7 @@ export function leadsToCSV(leads) {
     `"${(lead.location || '').replace(/"/g, '""')}"`,
     `"${(lead.locationEvidence || '').replace(/"/g, '""')}"`,
     lead.atsDetected === null ? 'Not found' : (lead.hiringJobCount === 0 ? 'Not hiring' : 'Yes'),
-    `"${(lead.atsDetected && lead.hiringJobCount > 0 ? `${lead.hiringJobCount} open roles via ${lead.atsDetected} (${(() => { try { const u = new URL(lead.hiringSignalsEvidence); const p = u.pathname.split('/'); return u.hostname + (p.length > 1 ? '/' + p[1] : ''); } catch(e) { return lead.hiringSignalsEvidence; } })()})` : lead.hiringSignalsEvidence || '').replace(/"/g, '""')}"`, 
+    `"${(lead.atsDetected && lead.hiringJobCount > 0 ? `${lead.hiringJobCount} open roles` + (lead.engineeringRolesCount ? `, ${lead.engineeringRolesCount} engineering/product/data` : '') + ` via ${lead.atsDetected} (${(() => { try { const u = new URL(lead.hiringSignalsEvidence); const p = u.pathname.split('/'); return u.hostname + (p.length > 1 ? '/' + p[1] : ''); } catch(e) { return lead.hiringSignalsEvidence; } })()})` : lead.hiringSignalsEvidence || '').replace(/"/g, '""')}"`, 
     `"${(lead.techSignals || []).map(t => typeof t === 'object' ? `${t.tech} (${t.count}/${t.totalRoles})` : t).join('; ').replace(/"/g, '""')}"`,
     `"${(lead.reason || '').replace(/"/g, '""')}"`,
     `"${(lead.outreach || '').replace(/"/g, '""')}"`,

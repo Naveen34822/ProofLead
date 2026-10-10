@@ -668,7 +668,7 @@ ${combinedText.slice(0, 30000)}`;
     }
     
     // Verification step
-    const normalize = (str) => String(str).toLowerCase().replace(/[\u2018\u2019\u201C\u201D"']/g, '').replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    const normalize = (str) => String(str).toLowerCase().replace(/[\u2018\u2019\u201C\u201D"']/g, '').replace(/[\u2013\u2014-]/g, ' ').replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
     const verifyEvidence = (evidence, fullText) => {
       if (!evidence || evidence === 'unknown' || evidence === 'Not found on fetched pages') return true;
       if (String(evidence).startsWith('Found in ATS')) return true;
@@ -718,7 +718,8 @@ ${combinedText.slice(0, 30000)}`;
       data.atsDetected = atsJobs.atsDetected;
       data.hiringSignals = atsJobs.hiringSignals;
       data.hiringSignalsEvidence = atsJobs.hiringSignalsEvidence;
-      data.hiringJobCount = atsJobs.count; // atsJobs.count is already an integer
+      data.hiringJobCount = atsJobs.count;
+      data.engineeringRolesCount = atsJobs.atsTechFound && atsJobs.atsTechFound.length > 0 ? atsJobs.atsTechFound[0].totalRoles : null; // atsJobs.count is already an integer
     } else {
       data.atsDetected = null;
       data.hiringSignals = 'unknown';
