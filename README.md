@@ -172,6 +172,8 @@ ProofLead is one long-running Node.js web service (Express serving the built Rea
 
 ## Screenshots
 
+Screenshots were generated with scripts/generate_screenshots.js (Playwright) against the seeded demo data.
+
 | Results Dashboard | Supabase Detail Panel |
 | :---: | :---: |
 | ![Results Table](docs/screenshots/results_table.png) | ![Supabase Panel](docs/screenshots/supabase_panel.png) |

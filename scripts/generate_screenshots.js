@@ -1,4 +1,7 @@
+// Requires: npm i -D playwright && npx playwright install chromium
 const { chromium } = require('playwright');
+
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
@@ -6,7 +9,7 @@ const { chromium } = require('playwright');
   const page = await context.newPage();
   
   try {
-    await page.goto('http://localhost:3001/');
+    await page.goto(BASE_URL);
     
     // Step 1: Wait for ICP and click "DevTools" and "Productivity" then Submit
     await page.waitForSelector('button.chip:has-text("DevTools")');
@@ -15,14 +18,14 @@ const { chromium } = require('playwright');
     await page.click('button:has-text("Continue to Company Upload")');
     
     // Step 2: Load sample dataset
-    await page.waitForSelector('button:has-text("Load sample dataset")');
-    await page.click('button:has-text("Load sample dataset")');
+    await page.waitForSelector('button:has-text("Use Sample Dataset")');
+    await page.click('button:has-text("Use Sample Dataset")');
     
-    // Wait for enriching overlay to disappear
-    await page.waitForSelector('.enriching-overlay', { state: 'hidden', timeout: 60000 });
+    // Wait for enriching overlay to disappear (allow 120s)
+    await page.waitForSelector('.enriching-overlay', { state: 'hidden', timeout: 120000 });
     
-    // Wait for the table to appear
-    await page.waitForSelector('.results-table-container');
+    // Wait for the table to appear (allow 120s)
+    await page.waitForSelector('table', { timeout: 120000 });
     
     // Screenshot: results table
     await page.screenshot({ path: 'docs/screenshots/results_table.png', fullPage: false });
@@ -34,7 +37,7 @@ const { chromium } = require('playwright');
     await page.waitForTimeout(1000); // Wait for animation
     await page.screenshot({ path: 'docs/screenshots/supabase_panel.png' });
     console.log("Screenshot saved: docs/screenshots/supabase_panel.png");
-    await page.click('.panel-close');
+    await page.keyboard.press('Escape'); await page.waitForTimeout(500);
     
     // Screenshot: Notion detail panel
     await page.click('tr:has-text("notion.so")');
@@ -42,7 +45,7 @@ const { chromium } = require('playwright');
     await page.waitForTimeout(1000); // Wait for animation
     await page.screenshot({ path: 'docs/screenshots/notion_panel.png' });
     console.log("Screenshot saved: docs/screenshots/notion_panel.png");
-    await page.click('.panel-close');
+    await page.keyboard.press('Escape'); await page.waitForTimeout(500);
     
     // Screenshot: Loom panel
     await page.click('tr:has-text("loom.com")');
