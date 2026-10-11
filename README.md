@@ -19,22 +19,81 @@ SaaSquatch is Caprae's lead-generation platform for entrepreneurs and searchers.
 
 ## UX Design Choices
 
-- **Three-Step Flow:** Define ICP, Add Companies, View Results. Users always know where they are in the qualification process.
+- **Three-Step Flow:** Define ICP, Add Companies, View Results. Users always know where they are.
 - **Evidence Panel:** Clicking a lead opens a drawer with each field, its source (website page, page title/meta, ATS, or CSV) and the supporting quote. This is how a user verifies a lead without leaving the app.
 - **Honest Empty States:** "Not found" (no detectable job board) is shown differently from "Not hiring" (job board found, zero roles). Unknown stays unknown.
 - **Signal Count:** Each score shows how many signals it is based on (for example 3 of 4), so a score built on little data is visible as such. The denominator changes with the ICP (location counts only if the user set one).
 - **Confidence and Filters:** Filter by score, status, industry, confidence, and hiring, and hide leads with missing data.
-- **Live Budget Indicator:** The header displays real-time live enrichments remaining today.
+- **Live Budget Indicator:** The header shows how many live enrichments remain today.
 - **Workflow Fit:** CSV in, CSV out, with evidence and the suggested outreach angle included in the export.
 - **Sample Dataset:** One click loads cached companies so the tool can be tried without spending any budget.
 
 ---
 
+## Architecture
+
+ProofLead is built as a single monolithic service optimized for low latency, predictable costs, and verifiable data pipelines.
+
+### System Architecture
+```mermaid
+graph TD
+    Client["React / Vite Frontend (SPA)"]
+    Server["Monolithic Node.js / Express Server (Port 3001)"]
+    SQLite[("SQLite DB (leads.db & daily_stats)")]
+    Crawl["Web Crawler (Axios + Cheerio)"]
+    ATS["ATS APIs (Greenhouse, Lever, Ashby)"]
+    LLM["Groq API (openai/gpt-oss-120b)"]
+
+    Client -->|"API Requests: /api/enrich, /api/budget"| Server
+    Server -->|"Serves static build (frontend/dist)"| Client
+    Server -->|"1. Check Cache (leads.db)"| SQLite
+    Server -->|"2. Check Daily Cap (daily_stats)"| SQLite
+    Server -->|"3. Crawl Home, About, Careers"| Crawl
+    Server -->|"4. Query Job Boards"| ATS
+    Server -->|"5. Unstructured Extraction"| LLM
+    Server -->|"6. Store Verified Data & Increment Cap"| SQLite
+```
+
+### Qualification Workflow
+```mermaid
+flowchart TD
+    Start["User Submits Domain / CSV"] --> CacheCheck{"1. Domain in SQLite Cache (leads.db)?"}
+    CacheCheck -- "Yes (textLength >= 500, not forceRefresh)" --> ReturnCache["Return Cached Data (instant response, no LLM call)"]
+    
+    CacheCheck -- "No / forceRefresh" --> CapCheck{"2. Global Daily Cap or IP Rate Limit Exceeded?"}
+    CapCheck -- Exceeded --> FallbackCheck{"Previous Good Cache Exists?"}
+    FallbackCheck -- Yes --> ReturnStale["Return Cache with Cap Warning (HTTP 200)"]
+    FallbackCheck -- No --> Return429["Return Rate Limit Error (HTTP 429)"]
+    
+    CapCheck -- Under Cap --> RobotsCheck{"Robots.txt Allowed?"}
+    RobotsCheck -- Disallowed --> BlockedStatus["Mark as Blocked (HTTP 403 reason, no LLM call)"]
+    
+    RobotsCheck -- Allowed --> FetchPages["3. Fetch Pages (Home, About, Careers with 429 Backoff)"]
+    FetchPages --> ATSCheck{"Public ATS Detected (Greenhouse/Lever/Ashby)?"}
+    ATSCheck -- Yes --> ATSQuery["Query Public ATS API & Whitelist Tech Stack"]
+    ATSCheck -- No --> ATSNone["ATS Status: Not found"]
+    
+    FetchPages --> MetaExtract["Extract <title> & meta/og:description from Raw HTML"]
+    MetaExtract --> LLMCall["4. Groq LLM Extraction (openai/gpt-oss-120b)"]
+    
+    LLMCall --> VerifyEvidence{"5. Verbatim Evidence Verifier against Page Text & Title/Meta?"}
+    VerifyEvidence -- Match Found --> KeepVerified["Keep Field & Verbatim Evidence"]
+    VerifyEvidence -- Match Failed --> SetUnknown["Field & Evidence strictly set to unknown"]
+    
+    KeepVerified --> SaveRecord["6. Save Record to leads.db & Increment daily_stats"]
+    SetUnknown --> SaveRecord
+    
+    SaveRecord --> ClientScoring["7. Client-Side ICP Scoring & Ranking (scoringEngine.js)"]
+    ReturnCache --> ClientScoring
+```
+
+---
+
 ## Performance, Caching and Reliability
 
-- **SQLite Cache (`leads.db`):** One record per domain. A cached domain is returned immediately with no website fetch and no LLM call.
-- **Cost Control:** A daily cap (`DAILY_LIVE_CAP`) and a per-IP cap (`PER_IP_LIVE_CAP`). The counter lives in a small `daily_stats` table and only increases when a live enrichment completes successfully with enough page text.
-- **Resilience:** Automatic retry with backoff when a site returns HTTP 429, a clear "blocked" status when retries fail, and `robots.txt` is respected.
+- **SQLite Cache (`leads.db`):** One record per domain. A cached domain is returned immediately with instant response, no LLM call.
+- **Cost Control:** A daily cap (`DAILY_LIVE_CAP`) tracked in a small SQLite `daily_stats` table (increments only when a live enrichment completes successfully with textLength >= 500) and a per-IP cap (`PER_IP_LIVE_CAP`) enforced by Express rate-limit middleware.
+- **Resilience:** Automatic retry with backoff when a site returns HTTP 429 (delays of 2000ms and 4000ms or `Retry-After` header), a clear "blocked" status when retries fail, and `robots.txt` is respected.
 - **Data Quality:** LLM quotes are checked against the fetched page text (including `<title>` and meta description taken from the raw HTML). Script, style, and hidden elements are removed before text extraction.
 - **Tech-Stack Accuracy:** Technologies are counted at most once per role, using word-boundary matching and an alias map (for example postgres and postgresql become one entry). Ambiguous names such as "Go" require a case-sensitive match, and repeated company-intro paragraphs are stripped so they do not inflate counts. Counts are shown as "TypeScript (14/37 roles)" against the engineering, product, and data roles only.
 - **Automated Tests:** `npm test --prefix backend` runs the evidence verifier test suite.
@@ -128,7 +187,5 @@ ProofLead is one long-running Node.js web service (Express serving the built Rea
 
 ## Build Notes
 
-- **Time Spent:** Approximately 19 hours total.
-  - **Core build (~11 hours):** Express API and static hosting, Cheerio text extractors, ATS public API integrations for Greenhouse, Lever, and Ashby, 5-factor ICP scoring algorithm, React/Vite dashboard, and SQLite persistent caching.
-  - **Testing, Verification & Deployment (~8 hours):** Verbatim quote verification engine with raw HTML title/meta extraction, boilerplate filtering across ATS job descriptions, Node 20 ABI native binary compatibility for better-sqlite3, Playwright UI test automation, seed synchronization, and Render deployment hardening.
-- **AI Coding Tools Used:** Built pair-programming with the **Google Antigravity IDE** (Gemini 2.5 Pro) with Groq inference for live unstructured firmographic extraction.
+[Fill in honestly: how much time the core build took, and how the remaining time was spent on testing, verification and deployment.]
+[Fill in honestly: which AI coding tools you used.]
