@@ -3,195 +3,238 @@
     "domain": "notion.so",
     "data": {
       "industry": "Productivity",
-      "industryEvidence": "The AI workspace where teams get more done, faster.",
+      "industryEvidence": "We want to blend your workflow into an all-in-one workspace.",
       "industryInferred": true,
       "employeeSize": "unknown",
       "employeeSizeEvidence": "Not found on fetched pages",
-      "techSignals": [
-        {
-          "tech": "node.js",
-          "count": 23,
-          "totalRoles": 36
-        },
-        {
-          "tech": "python",
-          "count": 16,
-          "totalRoles": 36
-        },
-        {
-          "tech": "typescript",
-          "count": 14,
-          "totalRoles": 36
-        },
-        {
-          "tech": "react",
-          "count": 9,
-          "totalRoles": 36
-        },
-        {
-          "tech": "aws",
-          "count": 7,
-          "totalRoles": 36
-        },
-        {
-          "tech": "java",
-          "count": 6,
-          "totalRoles": 36
-        },
-        {
-          "tech": "javascript",
-          "count": 6,
-          "totalRoles": 36
-        },
-        {
-          "tech": "gcp",
-          "count": 5,
-          "totalRoles": 36
-        },
-        {
-          "tech": "azure",
-          "count": 5,
-          "totalRoles": 36
-        },
-        {
-          "tech": "mysql",
-          "count": 5,
-          "totalRoles": 36
-        },
-        {
-          "tech": "kubernetes",
-          "count": 3,
-          "totalRoles": 36
-        },
-        {
-          "tech": "go",
-          "count": 3,
-          "totalRoles": 36
-        },
-        {
-          "tech": "elasticsearch",
-          "count": 3,
-          "totalRoles": 36
-        },
-        {
-          "tech": "rust",
-          "count": 3,
-          "totalRoles": 36
-        }
-      ],
-      "techSignalsEvidence": "Found in ATS: node.js in 23 of 36 engineering/product roles",
       "hiringSignals": true,
       "hiringSignalsEvidence": "https://jobs.ashbyhq.com/notion/8b82e596-e828-45db-94d5-b76acc89e749",
-      "hiringJobCount": 133,
-      "location": "San Francisco, USA",
+      "hiringJobCount": 132,
+      "location": "San Francisco, United States",
       "locationEvidence": "Notion is based in beautiful downtown San Francisco, with offices around the world.",
-      "businessModel": "SaaS",
-      "businessModelEvidence": "The AI workspace that works for you.",
+      "businessModel": "unknown",
+      "businessModelEvidence": "unknown",
+      "techSignals": [
+        {
+          "tech": "Python",
+          "source": "ats",
+          "count": 17,
+          "totalRoles": 37
+        },
+        {
+          "tech": "TypeScript",
+          "source": "ats",
+          "count": 14,
+          "totalRoles": 37
+        },
+        {
+          "tech": "Node.js",
+          "source": "ats",
+          "count": 13,
+          "totalRoles": 37
+        },
+        {
+          "tech": "JavaScript",
+          "source": "ats",
+          "count": 13,
+          "totalRoles": 37
+        },
+        {
+          "tech": "React",
+          "source": "ats",
+          "count": 9,
+          "totalRoles": 37
+        },
+        {
+          "tech": "AWS",
+          "source": "ats",
+          "count": 7,
+          "totalRoles": 37
+        },
+        {
+          "tech": "Java",
+          "source": "ats",
+          "count": 6,
+          "totalRoles": 37
+        },
+        {
+          "tech": "PostgreSQL",
+          "source": "ats",
+          "count": 6,
+          "totalRoles": 37
+        },
+        {
+          "tech": "GCP",
+          "source": "ats",
+          "count": 5,
+          "totalRoles": 37
+        },
+        {
+          "tech": "Azure",
+          "source": "ats",
+          "count": 5,
+          "totalRoles": 37
+        },
+        {
+          "tech": "MySQL",
+          "source": "ats",
+          "count": 5,
+          "totalRoles": 37
+        },
+        {
+          "tech": "Kubernetes",
+          "source": "ats",
+          "count": 3,
+          "totalRoles": 37
+        },
+        {
+          "tech": "Go",
+          "source": "ats",
+          "count": 3,
+          "totalRoles": 37
+        },
+        {
+          "tech": "Elasticsearch",
+          "source": "ats",
+          "count": 3,
+          "totalRoles": 37
+        },
+        {
+          "tech": "Rust",
+          "source": "ats",
+          "count": 3,
+          "totalRoles": 37
+        }
+      ],
+      "techSignalsEvidence": "",
+      "atsDetected": "ashby",
+      "engineeringRolesCount": 37,
+      "locationEvidenceType": "about page",
       "confidence": "medium",
       "enrichmentSource": "live",
-      "textLength": 7564,
+      "textLength": 6692,
       "pageTextLengths": {
-        "home": 1534,
-        "about": 3000,
-        "careers": 3000
+        "home": 0,
+        "about": 3174,
+        "careers": 3153
       },
       "sources": {
-        "home": "https://www.notion.so",
-        "about": "https://www.notion.so/about",
-        "careers": "https://www.notion.so/careers"
+        "home": "https://notion.so",
+        "about": "https://notion.so/about",
+        "careers": "https://notion.so/careers"
       },
-      "fetchedAt": "2026-10-09T10:32:29.082Z",
+      "fetchedAt": "2026-10-11T07:10:58.648Z",
       "enrichmentStatus": "success",
       "_diagnostics": {
         "rawLLM": {
           "industry": "Productivity",
-          "industryEvidence": "The AI workspace where teams get more done, faster.",
+          "industryEvidence": "We want to blend your workflow into an all-in-one workspace.",
           "industryInferred": true,
           "employeeSize": "unknown",
           "employeeSizeEvidence": "Not found on fetched pages",
-          "techSignals": [
-            {
-              "tech": "node.js",
-              "count": 23,
-              "totalRoles": 36
-            },
-            {
-              "tech": "python",
-              "count": 16,
-              "totalRoles": 36
-            },
-            {
-              "tech": "typescript",
-              "count": 14,
-              "totalRoles": 36
-            },
-            {
-              "tech": "react",
-              "count": 9,
-              "totalRoles": 36
-            },
-            {
-              "tech": "aws",
-              "count": 7,
-              "totalRoles": 36
-            },
-            {
-              "tech": "java",
-              "count": 6,
-              "totalRoles": 36
-            },
-            {
-              "tech": "javascript",
-              "count": 6,
-              "totalRoles": 36
-            },
-            {
-              "tech": "gcp",
-              "count": 5,
-              "totalRoles": 36
-            },
-            {
-              "tech": "azure",
-              "count": 5,
-              "totalRoles": 36
-            },
-            {
-              "tech": "mysql",
-              "count": 5,
-              "totalRoles": 36
-            },
-            {
-              "tech": "kubernetes",
-              "count": 3,
-              "totalRoles": 36
-            },
-            {
-              "tech": "go",
-              "count": 3,
-              "totalRoles": 36
-            },
-            {
-              "tech": "elasticsearch",
-              "count": 3,
-              "totalRoles": 36
-            },
-            {
-              "tech": "rust",
-              "count": 3,
-              "totalRoles": 36
-            }
-          ],
-          "techSignalsEvidence": "Found in ATS: node.js in 23 of 36 engineering/product roles",
           "hiringSignals": true,
           "hiringSignalsEvidence": "https://jobs.ashbyhq.com/notion/8b82e596-e828-45db-94d5-b76acc89e749",
-          "hiringJobCount": 133,
-          "location": "San Francisco, USA",
+          "hiringJobCount": 132,
+          "location": "San Francisco, United States",
           "locationEvidence": "Notion is based in beautiful downtown San Francisco, with offices around the world.",
-          "businessModel": "SaaS",
-          "businessModelEvidence": "The AI workspace that works for you."
+          "businessModel": "unknown",
+          "businessModelEvidence": "unknown",
+          "techSignals": [
+            {
+              "tech": "Python",
+              "source": "ats",
+              "count": 17,
+              "totalRoles": 37
+            },
+            {
+              "tech": "TypeScript",
+              "source": "ats",
+              "count": 14,
+              "totalRoles": 37
+            },
+            {
+              "tech": "Node.js",
+              "source": "ats",
+              "count": 13,
+              "totalRoles": 37
+            },
+            {
+              "tech": "JavaScript",
+              "source": "ats",
+              "count": 13,
+              "totalRoles": 37
+            },
+            {
+              "tech": "React",
+              "source": "ats",
+              "count": 9,
+              "totalRoles": 37
+            },
+            {
+              "tech": "AWS",
+              "source": "ats",
+              "count": 7,
+              "totalRoles": 37
+            },
+            {
+              "tech": "Java",
+              "source": "ats",
+              "count": 6,
+              "totalRoles": 37
+            },
+            {
+              "tech": "PostgreSQL",
+              "source": "ats",
+              "count": 6,
+              "totalRoles": 37
+            },
+            {
+              "tech": "GCP",
+              "source": "ats",
+              "count": 5,
+              "totalRoles": 37
+            },
+            {
+              "tech": "Azure",
+              "source": "ats",
+              "count": 5,
+              "totalRoles": 37
+            },
+            {
+              "tech": "MySQL",
+              "source": "ats",
+              "count": 5,
+              "totalRoles": 37
+            },
+            {
+              "tech": "Kubernetes",
+              "source": "ats",
+              "count": 3,
+              "totalRoles": 37
+            },
+            {
+              "tech": "Go",
+              "source": "ats",
+              "count": 3,
+              "totalRoles": 37
+            },
+            {
+              "tech": "Elasticsearch",
+              "source": "ats",
+              "count": 3,
+              "totalRoles": 37
+            },
+            {
+              "tech": "Rust",
+              "source": "ats",
+              "count": 3,
+              "totalRoles": 37
+            }
+          ],
+          "techSignalsEvidence": ""
         },
         "rejectedFields": [],
-        "tokens": 2926
+        "tokens": 2482
       }
     }
   },
@@ -801,251 +844,262 @@
     "domain": "supabase.com",
     "data": {
       "industry": "DevTools",
-      "industryEvidence": "\"Supabase is the Postgres development platform, built by developers for developers.\"",
+      "industryEvidence": "Build production-grade applications with a Postgres database, Authentication, instant APIs, Realtime, Functions, Storage and Vector embeddings.",
       "industryInferred": true,
       "employeeSize": "350+",
-      "employeeSizeEvidence": "\"350+ team members in 60+ countries\"",
-      "techSignals": [],
-      "techSignalsEvidence": "unknown",
+      "employeeSizeEvidence": "350+ team members in 60+ countries",
       "hiringSignals": true,
       "hiringSignalsEvidence": "https://jobs.ashbyhq.com/supabase/form/talent-community-form",
-      "hiringJobCount": 52,
+      "hiringJobCount": 54,
       "location": "unknown",
-      "locationEvidence": "\"There are no Supabase offices\"",
+      "locationEvidence": "Not found on fetched pages",
       "businessModel": "unknown",
       "businessModelEvidence": "unknown",
-      "confidence": "medium",
+      "techSignals": [
+        {
+          "tech": "PostgreSQL",
+          "source": "ats",
+          "count": 29,
+          "totalRoles": 40
+        },
+        {
+          "tech": "AWS",
+          "source": "ats",
+          "count": 18,
+          "totalRoles": 40
+        },
+        {
+          "tech": "JavaScript",
+          "source": "ats",
+          "count": 12,
+          "totalRoles": 40
+        },
+        {
+          "tech": "Go",
+          "source": "ats",
+          "count": 10,
+          "totalRoles": 40
+        },
+        {
+          "tech": "TypeScript",
+          "source": "ats",
+          "count": 9,
+          "totalRoles": 40
+        },
+        {
+          "tech": "React",
+          "source": "ats",
+          "count": 8,
+          "totalRoles": 40
+        },
+        {
+          "tech": "Vue.js",
+          "source": "ats",
+          "count": 8,
+          "totalRoles": 40
+        },
+        {
+          "tech": "Svelte",
+          "source": "ats",
+          "count": 8,
+          "totalRoles": 40
+        },
+        {
+          "tech": "Kubernetes",
+          "source": "ats",
+          "count": 7,
+          "totalRoles": 40
+        },
+        {
+          "tech": "Terraform",
+          "source": "ats",
+          "count": 7,
+          "totalRoles": 40
+        },
+        {
+          "tech": "Node.js",
+          "source": "ats",
+          "count": 5,
+          "totalRoles": 40
+        },
+        {
+          "tech": "Rust",
+          "source": "ats",
+          "count": 5,
+          "totalRoles": 40
+        },
+        {
+          "tech": "Python",
+          "source": "ats",
+          "count": 4,
+          "totalRoles": 40
+        },
+        {
+          "tech": "GCP",
+          "source": "ats",
+          "count": 4,
+          "totalRoles": 40
+        },
+        {
+          "tech": "Next.js",
+          "source": "ats",
+          "count": 4,
+          "totalRoles": 40
+        },
+        {
+          "tech": "Prometheus",
+          "source": "ats",
+          "count": 3,
+          "totalRoles": 40
+        },
+        {
+          "tech": "Grafana",
+          "source": "ats",
+          "count": 3,
+          "totalRoles": 40
+        }
+      ],
+      "techSignalsEvidence": "",
+      "atsDetected": "ashby",
+      "engineeringRolesCount": 40,
+      "locationEvidenceType": "unknown",
+      "confidence": "high",
       "enrichmentSource": "live",
-      "textLength": 11336,
+      "textLength": 12620,
       "pageTextLengths": {
-        "home": 6000,
-        "about": 2306,
-        "careers": 3000
+        "home": 6244,
+        "about": 2588,
+        "careers": 3094
       },
       "sources": {
         "home": "https://supabase.com",
         "about": "https://supabase.com/about",
         "careers": "https://supabase.com/careers"
       },
-      "fetchedAt": "2026-10-09T06:24:09.204Z",
+      "fetchedAt": "2026-10-11T07:10:09.872Z",
       "enrichmentStatus": "success",
       "_diagnostics": {
         "rawLLM": {
           "industry": "DevTools",
-          "industryEvidence": "\"Supabase is the Postgres development platform, built by developers for developers.\"",
+          "industryEvidence": "Build production-grade applications with a Postgres database, Authentication, instant APIs, Realtime, Functions, Storage and Vector embeddings.",
           "industryInferred": true,
           "employeeSize": "350+",
-          "employeeSizeEvidence": "\"350+ team members in 60+ countries\"",
-          "techSignals": [
-            {
-              "tech": "supabase",
-              "count": 38,
-              "totalRoles": 38
-            },
-            {
-              "tech": "aws",
-              "count": 16,
-              "totalRoles": 38
-            },
-            {
-              "tech": "postgresql",
-              "count": 13,
-              "totalRoles": 38
-            },
-            {
-              "tech": "javascript",
-              "count": 11,
-              "totalRoles": 38
-            },
-            {
-              "tech": "node.js",
-              "count": 10,
-              "totalRoles": 38
-            },
-            {
-              "tech": "react",
-              "count": 8,
-              "totalRoles": 38
-            },
-            {
-              "tech": "vue",
-              "count": 8,
-              "totalRoles": 38
-            },
-            {
-              "tech": "svelte",
-              "count": 8,
-              "totalRoles": 38
-            },
-            {
-              "tech": "typescript",
-              "count": 8,
-              "totalRoles": 38
-            },
-            {
-              "tech": "go",
-              "count": 8,
-              "totalRoles": 38
-            },
-            {
-              "tech": "kubernetes",
-              "count": 7,
-              "totalRoles": 38
-            },
-            {
-              "tech": "terraform",
-              "count": 6,
-              "totalRoles": 38
-            },
-            {
-              "tech": "python",
-              "count": 4,
-              "totalRoles": 38
-            },
-            {
-              "tech": "next.js",
-              "count": 4,
-              "totalRoles": 38
-            },
-            {
-              "tech": "rust",
-              "count": 4,
-              "totalRoles": 38
-            },
-            {
-              "tech": "gcp",
-              "count": 3,
-              "totalRoles": 38
-            },
-            {
-              "tech": "remix",
-              "count": 3,
-              "totalRoles": 38
-            },
-            {
-              "tech": "prometheus",
-              "count": 3,
-              "totalRoles": 38
-            },
-            {
-              "tech": "grafana",
-              "count": 3,
-              "totalRoles": 38
-            }
-          ],
-          "techSignalsEvidence": "\"Use Supabase with React import { createClient } from '@supabase/supabase-js'\" \"Next.js Starter A Next.js App Router template configured with cookie-based auth using Supabase, TypeScript and Tailwind CSS.\" \"Flutter User Management Get started with Supabase and Flutter by building a user management app\" \"Expo React Native Starter\" | Found in ATS: supabase in 38 of 38 engineering/product roles",
+          "employeeSizeEvidence": "350+ team members in 60+ countries",
           "hiringSignals": true,
           "hiringSignalsEvidence": "https://jobs.ashbyhq.com/supabase/form/talent-community-form",
-          "hiringJobCount": 52,
+          "hiringJobCount": 54,
           "location": "unknown",
-          "locationEvidence": "\"There are no Supabase offices\"",
-          "businessModel": "SaaS",
-          "businessModelEvidence": "\"Supabase is the Postgres development platform, built by developers for developers.\""
+          "locationEvidence": "Not found on fetched pages",
+          "businessModel": "unknown",
+          "businessModelEvidence": "unknown",
+          "techSignals": [
+            {
+              "tech": "PostgreSQL",
+              "source": "ats",
+              "count": 29,
+              "totalRoles": 40
+            },
+            {
+              "tech": "AWS",
+              "source": "ats",
+              "count": 18,
+              "totalRoles": 40
+            },
+            {
+              "tech": "JavaScript",
+              "source": "ats",
+              "count": 12,
+              "totalRoles": 40
+            },
+            {
+              "tech": "Go",
+              "source": "ats",
+              "count": 10,
+              "totalRoles": 40
+            },
+            {
+              "tech": "TypeScript",
+              "source": "ats",
+              "count": 9,
+              "totalRoles": 40
+            },
+            {
+              "tech": "React",
+              "source": "ats",
+              "count": 8,
+              "totalRoles": 40
+            },
+            {
+              "tech": "Vue.js",
+              "source": "ats",
+              "count": 8,
+              "totalRoles": 40
+            },
+            {
+              "tech": "Svelte",
+              "source": "ats",
+              "count": 8,
+              "totalRoles": 40
+            },
+            {
+              "tech": "Kubernetes",
+              "source": "ats",
+              "count": 7,
+              "totalRoles": 40
+            },
+            {
+              "tech": "Terraform",
+              "source": "ats",
+              "count": 7,
+              "totalRoles": 40
+            },
+            {
+              "tech": "Node.js",
+              "source": "ats",
+              "count": 5,
+              "totalRoles": 40
+            },
+            {
+              "tech": "Rust",
+              "source": "ats",
+              "count": 5,
+              "totalRoles": 40
+            },
+            {
+              "tech": "Python",
+              "source": "ats",
+              "count": 4,
+              "totalRoles": 40
+            },
+            {
+              "tech": "GCP",
+              "source": "ats",
+              "count": 4,
+              "totalRoles": 40
+            },
+            {
+              "tech": "Next.js",
+              "source": "ats",
+              "count": 4,
+              "totalRoles": 40
+            },
+            {
+              "tech": "Prometheus",
+              "source": "ats",
+              "count": 3,
+              "totalRoles": 40
+            },
+            {
+              "tech": "Grafana",
+              "source": "ats",
+              "count": 3,
+              "totalRoles": 40
+            }
+          ],
+          "techSignalsEvidence": ""
         },
-        "rejectedFields": [
-          {
-            "field": "techSignals",
-            "value": [
-              {
-                "tech": "supabase",
-                "count": 38,
-                "totalRoles": 38
-              },
-              {
-                "tech": "aws",
-                "count": 16,
-                "totalRoles": 38
-              },
-              {
-                "tech": "postgresql",
-                "count": 13,
-                "totalRoles": 38
-              },
-              {
-                "tech": "javascript",
-                "count": 11,
-                "totalRoles": 38
-              },
-              {
-                "tech": "node.js",
-                "count": 10,
-                "totalRoles": 38
-              },
-              {
-                "tech": "react",
-                "count": 8,
-                "totalRoles": 38
-              },
-              {
-                "tech": "vue",
-                "count": 8,
-                "totalRoles": 38
-              },
-              {
-                "tech": "svelte",
-                "count": 8,
-                "totalRoles": 38
-              },
-              {
-                "tech": "typescript",
-                "count": 8,
-                "totalRoles": 38
-              },
-              {
-                "tech": "go",
-                "count": 8,
-                "totalRoles": 38
-              },
-              {
-                "tech": "kubernetes",
-                "count": 7,
-                "totalRoles": 38
-              },
-              {
-                "tech": "terraform",
-                "count": 6,
-                "totalRoles": 38
-              },
-              {
-                "tech": "python",
-                "count": 4,
-                "totalRoles": 38
-              },
-              {
-                "tech": "next.js",
-                "count": 4,
-                "totalRoles": 38
-              },
-              {
-                "tech": "rust",
-                "count": 4,
-                "totalRoles": 38
-              },
-              {
-                "tech": "gcp",
-                "count": 3,
-                "totalRoles": 38
-              },
-              {
-                "tech": "remix",
-                "count": 3,
-                "totalRoles": 38
-              },
-              {
-                "tech": "prometheus",
-                "count": 3,
-                "totalRoles": 38
-              },
-              {
-                "tech": "grafana",
-                "count": 3,
-                "totalRoles": 38
-              }
-            ],
-            "reason": "Quote not found in text: \"\"Use Supabase with React import { createClient } from '@supabase/supabase-js'\" \"Next.js Starter A Next.js App Router template configured with cookie-based auth using Supabase, TypeScript and Tailwind CSS.\" \"Flutter User Management Get started with Supabase and Flutter by building a user management app\" \"Expo React Native Starter\" | Found in ATS: supabase in 38 of 38 engineering/product roles\""
-          }
-        ],
-        "tokens": 4655
+        "rejectedFields": [],
+        "tokens": 3754
       }
     }
   },
@@ -1187,6 +1241,7 @@
       "businessModelEvidence": "unknown",
       "techSignals": [],
       "techSignalsEvidence": "unknown",
+      "atsDetected": null,
       "locationEvidenceType": "unknown",
       "confidence": "low",
       "enrichmentSource": "live",
@@ -1197,11 +1252,11 @@
         "careers": 3000
       },
       "sources": {
-        "home": "https://www.loom.com",
-        "about": "https://www.loom.com/about",
-        "careers": "https://www.loom.com/careers"
+        "home": "https://loom.com",
+        "about": "https://loom.com/about",
+        "careers": "https://loom.com/careers"
       },
-      "fetchedAt": "2026-10-09T10:52:49.064Z",
+      "fetchedAt": "2026-10-10T08:15:36.234Z",
       "enrichmentStatus": "success",
       "_diagnostics": {
         "rawLLM": {
@@ -1221,7 +1276,7 @@
           "techSignalsEvidence": "unknown"
         },
         "rejectedFields": [],
-        "tokens": 1972
+        "tokens": 1829
       }
     }
   },

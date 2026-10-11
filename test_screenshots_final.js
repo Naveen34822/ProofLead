@@ -34,7 +34,7 @@ const { chromium } = require('playwright');
     await page.waitForTimeout(1000); // Wait for animation
     await page.screenshot({ path: 'docs/screenshots/supabase_panel.png' });
     console.log("Screenshot saved: docs/screenshots/supabase_panel.png");
-    await page.click('.panel-close');
+    await page.keyboard.press('Escape'); await page.waitForTimeout(500);
     
     // Screenshot: Notion detail panel
     await page.click('tr:has-text("notion.so")');
@@ -42,7 +42,7 @@ const { chromium } = require('playwright');
     await page.waitForTimeout(1000); // Wait for animation
     await page.screenshot({ path: 'docs/screenshots/notion_panel.png' });
     console.log("Screenshot saved: docs/screenshots/notion_panel.png");
-    await page.click('.panel-close');
+    await page.keyboard.press('Escape'); await page.waitForTimeout(500);
     
     // Screenshot: Loom panel
     await page.click('tr:has-text("loom.com")');
