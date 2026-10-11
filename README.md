@@ -168,6 +168,8 @@ ProofLead is one long-running Node.js web service (Express serving the built Rea
    ```
    Navigate to `http://localhost:3001`.
 
+Upload sample_input.csv to try the tool; domains already in the seed are served from cache.
+
 ---
 
 ## Screenshots
