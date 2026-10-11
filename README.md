@@ -189,5 +189,8 @@ ProofLead is one long-running Node.js web service (Express serving the built Rea
 
 ## Build Notes
 
-[Fill in honestly: how much time the core build took, and how the remaining time was spent on testing, verification and deployment.]
-[Fill in honestly: which AI coding tools you used.]
+**Time:** The handbook asks for no more than 5 hours of coding. My core coding took about 7 hours, so I went about 2 hours over that guideline. I spent additional time on testing, verification, bug fixing and Render deployment. I am stating this plainly rather than fitting the numbers to the limit.
+
+**Scope:** I kept the scope to one core feature: evidence-backed lead qualification and scoring.
+
+**Tools:** I built this with an AI coding assistant. I reviewed and tested its output, caught and fixed several bugs and incorrect reports along the way, and made the product and deployment decisions myself. Groq's gpt-oss-120b is used inside the product for data extraction.
