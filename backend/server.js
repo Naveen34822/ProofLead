@@ -22,17 +22,7 @@ app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json());
 
-const liveEnrichLimiter = rateLimit({
-  windowMs: 24 * 60 * 60 * 1000, // 24 hours
-  max: parseInt(process.env.PER_IP_LIVE_CAP) || 5, // Limit each IP to 5 requests per `window` (here, per hour)
-  skip: (req) => {
-    return req.ip === '127.0.0.1' || req.ip === '::1' || req.ip === '::ffff:127.0.0.1';
-  },
-  handler: (req, res, next) => {
-    req.rateLimitExceeded = true;
-    next();
-  }
-});
+
 
 import Database from 'better-sqlite3';
 
@@ -67,6 +57,33 @@ db.exec(`
     count INTEGER
   )
 `);
+
+const liveEnrichLimiter = rateLimit({
+  windowMs: 24 * 60 * 60 * 1000, // 24 hours
+  max: parseInt(process.env.PER_IP_LIVE_CAP) || 5,
+  skip: (req) => {
+    if (req.ip === '127.0.0.1' || req.ip === '::1' || req.ip === '::ffff:127.0.0.1') {
+      return true;
+    }
+    const domain = req.body?.domain;
+    if (domain && !req.body?.forceRefresh) {
+      try {
+        const row = db.prepare('SELECT data FROM leads WHERE domain = ?').get(domain);
+        if (row && row.data) {
+          const cachedData = JSON.parse(row.data);
+          if (cachedData.textLength >= 500 && cachedData.enrichmentStatus !== 'failed') {
+            return true;
+          }
+        }
+      } catch (err) {}
+    }
+    return false;
+  },
+  handler: (req, res, next) => {
+    req.rateLimitExceeded = true;
+    next();
+  }
+});
 
 
 const seedDir = path.join(__dirname, 'seed');

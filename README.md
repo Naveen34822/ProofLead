@@ -94,7 +94,7 @@ flowchart TD
 ## Performance, Caching and Reliability
 
 - **SQLite Cache (`leads.db`):** One record per domain. A cached domain is returned immediately with instant response, no LLM call.
-- **Cost Control:** A daily cap (`DAILY_LIVE_CAP`) tracked in a small SQLite `daily_stats` table (increments only when a live enrichment completes successfully with textLength >= 500) and a per-IP cap (`PER_IP_LIVE_CAP`) enforced in memory per IP (resets on restart).
+- **Cost Control:** A daily cap (`DAILY_LIVE_CAP`) tracked in a small SQLite `daily_stats` table (increments only when a live enrichment completes successfully with textLength >= 500) and a per-IP cap (`PER_IP_LIVE_CAP`) where only live enrichments count toward it (cache hits do not), enforced in memory per IP, resets on restart.
 - **Resilience:** Automatic retry with backoff when a site returns HTTP 429 (delays of 2000ms and 4000ms or `Retry-After` header), a clear "blocked" status when retries fail, and `robots.txt` is respected.
 - **Data Quality:** LLM quotes are checked against the fetched page text (including `<title>` and meta description taken from the raw HTML). Script, style, and hidden elements are removed before text extraction.
 - **Tech-Stack Accuracy:** Technologies are counted at most once per role, using word-boundary matching and an alias map (for example postgres and postgresql become one entry). Ambiguous names such as "Go" require a case-sensitive match, and repeated company-intro paragraphs are stripped so they do not inflate counts. Counts are shown as "TypeScript (14/37 roles)" against the engineering, product, and data roles only.
