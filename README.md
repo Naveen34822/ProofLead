@@ -58,7 +58,7 @@ graph TD
 ```mermaid
 flowchart TD
     Start["User Submits Domain / CSV"] --> CacheCheck{"1. Domain in SQLite Cache (leads.db)?"}
-    CacheCheck -- "Yes (textLength >= 500, not forceRefresh)" --> ReturnCache["Return Cached Data (instant response, no LLM call)"]
+    CacheCheck -- "Yes (textLength at least 500, not forceRefresh)" --> ReturnCache["Return Cached Data (instant response, no LLM call)"]
     
     CacheCheck -- "No / forceRefresh" --> CapCheck{"2. Global Daily Cap or IP Rate Limit Exceeded?"}
     CapCheck -- Exceeded --> FallbackCheck{"Previous Good Cache Exists?"}
@@ -69,11 +69,13 @@ flowchart TD
     RobotsCheck -- Disallowed --> BlockedStatus["Mark as Blocked (HTTP 403 reason, no LLM call)"]
     
     RobotsCheck -- Allowed --> FetchPages["3. Fetch Pages (Home, About, Careers with 429 Backoff)"]
-    FetchPages --> ATSCheck{"Public ATS Detected (Greenhouse/Lever/Ashby)?"}
+    FetchPages -- "Site blocked after retries (HTTP 429/403)" --> BlockedFetch["Mark as Blocked (budget not used)"]
+    
+    FetchPages -- "Pages fetched" --> ATSCheck{"Public ATS Detected (Greenhouse/Lever/Ashby)?"}
     ATSCheck -- Yes --> ATSQuery["Query Public ATS API & Whitelist Tech Stack"]
     ATSCheck -- No --> ATSNone["ATS Status: Not found"]
     
-    FetchPages --> MetaExtract["Extract <title> & meta/og:description from Raw HTML"]
+    FetchPages -- "Pages fetched" --> MetaExtract["Extract page title & meta/og:description from Raw HTML"]
     MetaExtract --> LLMCall["4. Groq LLM Extraction (openai/gpt-oss-120b)"]
     
     LLMCall --> VerifyEvidence{"5. Verbatim Evidence Verifier against Page Text & Title/Meta?"}
@@ -92,7 +94,7 @@ flowchart TD
 ## Performance, Caching and Reliability
 
 - **SQLite Cache (`leads.db`):** One record per domain. A cached domain is returned immediately with instant response, no LLM call.
-- **Cost Control:** A daily cap (`DAILY_LIVE_CAP`) tracked in a small SQLite `daily_stats` table (increments only when a live enrichment completes successfully with textLength >= 500) and a per-IP cap (`PER_IP_LIVE_CAP`) enforced by Express rate-limit middleware.
+- **Cost Control:** A daily cap (`DAILY_LIVE_CAP`) tracked in a small SQLite `daily_stats` table (increments only when a live enrichment completes successfully with textLength >= 500) and a per-IP cap (`PER_IP_LIVE_CAP`) enforced in memory per IP (resets on restart).
 - **Resilience:** Automatic retry with backoff when a site returns HTTP 429 (delays of 2000ms and 4000ms or `Retry-After` header), a clear "blocked" status when retries fail, and `robots.txt` is respected.
 - **Data Quality:** LLM quotes are checked against the fetched page text (including `<title>` and meta description taken from the raw HTML). Script, style, and hidden elements are removed before text extraction.
 - **Tech-Stack Accuracy:** Technologies are counted at most once per role, using word-boundary matching and an alias map (for example postgres and postgresql become one entry). Ambiguous names such as "Go" require a case-sensitive match, and repeated company-intro paragraphs are stripped so they do not inflate counts. Counts are shown as "TypeScript (14/37 roles)" against the engineering, product, and data roles only.
