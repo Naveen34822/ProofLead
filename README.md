@@ -15,6 +15,8 @@ ProofLead aligns perfectly with Caprae Capital's PE sourcing strategy. By analyz
 
 ## Limitations & Ethical Data Collection
 - Hiring and tech signals come only from Greenhouse/Lever/Ashby; companies without a detectable public ATS (e.g. Loom, acquired by Atlassian) show 'Not found'.
+- **Evidence Verification:** Evidence is verified verbatim against fetched page text; `<title>` and `<meta name="description">` / `og:description` from raw HTML are included in the verified first-party text under a labelled 'Page title/meta' section. When an extracted quote cannot be verified against the text, the field strictly remains 'unknown' (with evidence 'unknown') rather than guessed.
+- Some sites render their homepage with JavaScript (e.g. Notion), so only About/Careers text and title/meta are available.
 - **Ephemeral disk tradeoff on Render free tier:** Because the Render free tier uses ephemeral storage, the SQLite database (`leads.db`) is reset on every deployment or server restart. A seed file (`leads.json`) is used to populate initial data on boot.
 
 ## Setup & Run Instructions

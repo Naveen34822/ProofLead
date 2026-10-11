@@ -164,6 +164,19 @@ const extractText = (html, maxLimit = 15000) => {
   return text.slice(0, maxLimit);
 };
 
+const extractRawMeta = (rawHtml) => {
+  if (!rawHtml || typeof rawHtml !== "string") return { title: "", metaDesc: "", ogDesc: "" };
+  try {
+    const $raw = cheerio.load(rawHtml);
+    const title = ($raw("head > title").text() || $raw("title").first().text() || "").replace(/\s+/g, " ").trim();
+    const metaDesc = ($raw("meta[name=\"description\"]").attr("content") || "").replace(/\s+/g, " ").trim();
+    const ogDesc = ($raw("meta[property=\"og:description\"]").attr("content") || $raw("meta[name=\"og:description\"]").attr("content") || "").replace(/\s+/g, " ").trim();
+    return { title, metaDesc, ogDesc };
+  } catch (err) {
+    return { title: "", metaDesc: "", ogDesc: "" };
+  }
+};
+
 const fetchPage = async (url, usePuppeteer = false, retryCount = 0, isWwwRetry = false, charLimit = 15000) => {
   try {
     if (usePuppeteer && process.env.PUPPETEER_ENABLED !== 'false') {
@@ -175,9 +188,15 @@ const fetchPage = async (url, usePuppeteer = false, retryCount = 0, isWwwRetry =
       await page.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
       const html = await page.content();
       await browser.close();
-      const text = extractText(html, charLimit);
+      const { title, metaDesc, ogDesc } = extractRawMeta(html);
+      const pageMetaParts = [];
+      if (title) pageMetaParts.push(`Title: ${title}`);
+      if (metaDesc) pageMetaParts.push(`Description: ${metaDesc}`);
+      if (ogDesc && ogDesc !== metaDesc) pageMetaParts.push(`og:description: ${ogDesc}`);
+      const pageMetaSection = pageMetaParts.length > 0 ? `\n\nPage title/meta:\n${pageMetaParts.join("\n")}\n` : "";
+      const text = extractText(html, charLimit) + pageMetaSection;
       console.log(`[Puppeteer] Fetched ${url} - Status: 200, Length: ${text.length}`);
-      return { text, html };
+      return { text, html, title, metaDesc, ogDesc };
     }
 
     const headers = {
@@ -188,7 +207,13 @@ const fetchPage = async (url, usePuppeteer = false, retryCount = 0, isWwwRetry =
     };
 
     const res = await axios.get(url, { timeout: 8000, headers, maxRedirects: 5 });
-    let text = extractText(res.data, charLimit);
+    const { title, metaDesc, ogDesc } = extractRawMeta(res.data);
+    const pageMetaParts = [];
+    if (title) pageMetaParts.push(`Title: ${title}`);
+    if (metaDesc) pageMetaParts.push(`Description: ${metaDesc}`);
+    if (ogDesc && ogDesc !== metaDesc) pageMetaParts.push(`og:description: ${ogDesc}`);
+    const pageMetaSection = pageMetaParts.length > 0 ? `\n\nPage title/meta:\n${pageMetaParts.join("\n")}\n` : "";
+    let text = extractText(res.data, charLimit) + pageMetaSection;
     
     console.log(`Fetched ${url} - Status: ${res.status}, Length: ${text.length}`);
     
@@ -197,7 +222,7 @@ const fetchPage = async (url, usePuppeteer = false, retryCount = 0, isWwwRetry =
       return await fetchPage(url, true, retryCount, isWwwRetry, charLimit);
     }
     
-    return { text, html: res.data };
+    return { text, html: res.data, title, metaDesc, ogDesc };
   } catch (e) {
     if (e.response && e.response.status === 403) {
       return { text: '', html: '', blocked: true, blockedCode: 403, blockedReason: 'HTTP 403' };
@@ -527,14 +552,35 @@ app.post('/api/enrich', liveEnrichLimiter, async (req, res) => {
 
   const atsJobs = await checkAtsJobs(careersReq.html || homeReq.html, domain);
   
-  // Extract meta/first-party text from home page
-  const $home = cheerio.load(homeReq.html);
-  const pageTitle = $home('title').text().trim();
-  const metaDesc = $home('meta[name="description"]').attr('content') || '';
-  const h1Text = $home('h1').map((_, el) => $home(el).text().trim()).get().join(' | ');
+  // Extract meta/first-party text from raw HTML of all fetched pages before stripping under labelled "Page title/meta" section
+  const pageMetaEntries = [];
+  const addPageMeta = (label, req) => {
+    if (!req) return;
+    if (req.title) pageMetaEntries.push(`${label} Title: ${req.title}`);
+    if (req.metaDesc) pageMetaEntries.push(`${label} Description: ${req.metaDesc}`);
+    if (req.ogDesc && req.ogDesc !== req.metaDesc) pageMetaEntries.push(`${label} og:description: ${req.ogDesc}`);
+  };
 
-  const metaText = `HOME PAGE METADATA:\nTitle: ${pageTitle}\nDescription: ${metaDesc}\nH1: ${h1Text}\n\n`;
-  const combinedText = metaText + `HOMEPAGE:\n${homeReq.text}\n\nABOUT:\n${aboutReq.text}\n\nCAREERS:\n${careersReq.text}`;
+  addPageMeta('Home', homeReq);
+  addPageMeta('About', aboutReq);
+  addPageMeta('Careers', careersReq);
+
+  let h1Text = '';
+  if (homeReq.html) {
+    try {
+      const $home = cheerio.load(homeReq.html);
+      h1Text = $home('h1').map((_, el) => $home(el).text().trim()).get().join(' | ');
+    } catch (err) {}
+  }
+  if (h1Text) {
+    pageMetaEntries.push(`Home H1: ${h1Text}`);
+  }
+
+  const metaText = pageMetaEntries.length > 0 
+    ? `Page title/meta:\n${pageMetaEntries.join('\n')}\n\n`
+    : '';
+
+  const combinedText = `${metaText}HOMEPAGE:\n${homeReq.text}\n\nABOUT:\n${aboutReq.text}\n\nCAREERS:\n${careersReq.text}`;
   
   const sources = {
     home: baseUrl,
@@ -581,56 +627,13 @@ ${combinedText.slice(0, 30000)}`;
     if (process.env.DISABLE_LLM === '1') {
       throw new Error('LLM call disabled as per instructions');
     }
-    const primaryModel = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
-    const fallbackModel = 'openai/gpt-oss-20b';
-    
-    let response;
-    let attempts = 0;
-    const maxAttempts = 3;
-    let currentModel = primaryModel;
-    console.log(`[${domain}] Using model: ${currentModel}`);
-    
-    while (attempts < maxAttempts) {
-      try {
-        response = await groq.chat.completions.create({
-          model: currentModel,
-          messages: [{ role: 'user', content: prompt }],
-          response_format: { type: 'json_object' }
-        });
-        break; // Success
-      } catch (err) {
-        attempts++;
-        const isRateLimit = err.status === 429 || err.status === 503;
-        console.warn(`[${domain}] Attempt ${attempts} with ${currentModel} failed: ${err.message}`);
-        
-        if (attempts >= maxAttempts) {
-          if (currentModel === primaryModel) {
-            console.warn(`[${domain}] Primary model failed 3 times. Falling back to ${fallbackModel}...`);
-            currentModel = fallbackModel;
-            attempts = 0; // reset attempts for fallback
-            continue;
-          }
-          throw err; // Ultimate failure
-        }
-        
-        if (isRateLimit) {
-          const delay = Math.pow(2, attempts) * 1000 + Math.random() * 500;
-          console.log(`[${domain}] Rate limited. Waiting ${Math.round(delay)}ms...`);
-          await new Promise(r => setTimeout(r, delay));
-        } else if (err.status === 400 && err.error?.error?.code === 'json_validate_failed') {
-          console.log(`[${domain}] JSON parse error. Retrying...`);
-        } else {
-          // Force fallback switch on other errors
-          if (currentModel === primaryModel) {
-            console.warn(`[${domain}] Non-rate-limit error. Switching to ${fallbackModel}...`);
-            currentModel = fallbackModel;
-            attempts = 0;
-            continue;
-          }
-          throw err;
-        }
-      }
-    }
+    const model = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+    console.log(`[${domain}] Calling LLM with model: ${model} (single attempt, no retries, no other models)`);
+    const response = await groq.chat.completions.create({
+      model: model,
+      messages: [{ role: 'user', content: prompt }],
+      response_format: { type: 'json_object' }
+    });
 
     let data = JSON.parse(response.choices[0].message.content);
     
@@ -684,32 +687,36 @@ ${combinedText.slice(0, 30000)}`;
     
     // businessModel is deterministically generated, so no LLM verification needed
 
+    const hasUserCsvIndustry = typeof csvIndustry === 'string' && csvIndustry.trim().length > 0 && csvIndustry.trim().toLowerCase() !== 'unknown';
+
     if (!verifyEvidence(data.industryEvidence, combinedText)) {
       const reason = `Quote not found in text: "${data.industryEvidence}"`;
       console.warn(`[${domain}] REJECTED industry "${data.industry}". ${reason}`);
       rejectedFields.push({ field: 'industry', value: data.industry, reason });
-      data.industry = csvIndustry || 'unknown';
-      data.industryEvidence = csvIndustry ? null : 'unknown';
-      data.industryInferred = true;
+      if (hasUserCsvIndustry) {
+        data.industry = csvIndustry.trim();
+        data.industryEvidence = 'CSV';
+        data.industryInferred = true;
+      } else {
+        data.industry = 'unknown';
+        data.industryEvidence = 'unknown';
+        data.industryInferred = false;
+      }
     } else {
-      // First party validation
-      const firstPartyText = metaText + (aboutReq.text.length > 0 ? aboutReq.text.slice(0, 1500) : '');
+      // First party validation: check against Page title/meta, Home page text, and first 1500 chars of About
+      const firstPartyText = metaText + (homeReq.text ? `HOMEPAGE:\n${homeReq.text}\n\n` : '') + (aboutReq.text.length > 0 ? aboutReq.text.slice(0, 1500) : '');
       if (!verifyEvidence(data.industryEvidence, firstPartyText)) {
         const reason = `Quote not found in first-party text (Home Meta/H1 or first 1500 chars of About): "${data.industryEvidence}"`;
         console.warn(`[${domain}] REJECTED industry "${data.industry}". ${reason}`);
         rejectedFields.push({ field: 'industry', value: data.industry, reason });
-        
-        // Deterministic Fallback
-        const title = cheerio.load(combinedText)('title').text() || cheerio.load(metaText)('title').text();
-        const metaDesc = cheerio.load(combinedText)('meta[name="description"]').attr('content') || cheerio.load(metaText)('meta[name="description"]').attr('content');
-        
-        if (title || metaDesc) {
-            data.industry = csvIndustry || data.industry;
-            data.industryEvidence = `Page title/meta: ${title || metaDesc}`;
+        if (hasUserCsvIndustry) {
+          data.industry = csvIndustry.trim();
+          data.industryEvidence = 'CSV';
+          data.industryInferred = true;
         } else {
-            data.industry = csvIndustry || 'unknown';
-            data.industryEvidence = csvIndustry ? null : 'unknown';
-            data.industryInferred = true;
+          data.industry = 'unknown';
+          data.industryEvidence = 'unknown';
+          data.industryInferred = false;
         }
       }
     }

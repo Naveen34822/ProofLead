@@ -1,4 +1,4 @@
-const assert = require('assert');
+import assert from 'assert';
 
 // The verifier function used in server.js
 const normalize = (str) => String(str).toLowerCase().replace(/[\u2018\u2019\u201C\u201D"']/g, '').replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
