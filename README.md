@@ -2,6 +2,10 @@
 
 **Live Demo:** https://prooflead.onrender.com
 
+> **Assignment note:** ProofLead was built as my submission for Caprae Capital's AI-Readiness Pre-Screening Challenge (Full Stack Developer interview pre-work). It is a time-boxed assignment prototype, not a production product, and it is not affiliated with SaaSquatch. It works only with publicly available company information.
+>
+> The live demo runs on a free instance, so the first request can take up to a minute to wake up.
+
 ProofLead is an evidence-backed lead qualification and ICP scoring platform built for Private Equity (PE) and M&A searchers. It extracts verified hiring and technology signals directly from public company websites and Applicant Tracking Systems (ATS) to identify growth and acquisition readiness.
 
 ---
